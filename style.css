@@ -9,7 +9,9 @@ body {
   --primary_dark: #232946;
   --spacing: 14px;
 
-  padding: 2em;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
   margin: 0;
   background: var(--background);
   color: var(--primary_dark);
@@ -45,6 +47,7 @@ h1, h2, h3 {
 
 .album {
   position: relative;
+  box-shadow: 0 10px 20px -15px rgba(0, 0, 0, .35), 0 22px 40px -15px rgba(0, 0, 0, .20);
 }
 
 .overlay {
@@ -78,7 +81,8 @@ h1, h2, h3 {
 
 .controls {
   width: 300px;
-  margin: 30px auto;
+  margin: 0 auto;
+  margin-top: 30px;
 }
 
 .progress {
@@ -131,13 +135,24 @@ canvas {
   transform: scale(1.1);
 }
 
+.waves {
+  position: absolute;
+  bottom: 0;
+  width: 100vw;
+  z-index: -1;
+}
+.waves > svg > path:first-of-type {
+  fill: var(--primary_light);
+}
+.waves > svg > path:last-of-type {
+  fill: var(--tertiary_light);
+}
 progress {
   -webkit-appearance: none;
   border: none;
   box-shadow: none;
   height: 4px;
 }
-
 
 /* Background. */
 progress::-webkit-progress-bar {
