@@ -1,6 +1,7 @@
 * {box-sizing: border-box}
 [hidden] {display: none !important}
 [disabled] {pointer-events:none; opacity: 0.3}
+
 body {
   --background: #f2f4f6;
   --primary_light: #f582ae;
@@ -8,6 +9,7 @@ body {
   --tertiary_light: #00ebc7;
   --primary_dark: #232946;
   --spacing: 14px;
+  --spacing-m: 28px;
 
   width: 100vw;
   height: 100vh;
@@ -16,11 +18,14 @@ body {
   background: var(--background);
   color: var(--primary_dark);
   font-family: 'Work Sans', sans-serif;
-  text-align: center;
 }
 
-h1, h2, h3 {
-  font-weight: lighter;
+h1 {
+  text-align: center;
+  position: relative;
+  font-weight: 900;
+  font-size: 60px;
+  letter-spacing: 4px;
 }
 
 .vertical {
@@ -37,57 +42,44 @@ h1, h2, h3 {
   align-items: center;
 }
 
-.main {
-  height: 100%;
-  width: 100%;
-  max-width: 700px;
-  margin: 0 auto;
-  justify-content: space-around;
+.box {
+  position: relative;
+  background: white;
+  padding: var(--spacing) var(--spacing-m);
+  border-radius: var(--spacing);
+  margin: 200px auto;
+  height:200px;
+  box-shadow: 0 30px 56px 6px rgba(0, 0, 0, 0.1);
 }
 
 .album {
   position: relative;
-  box-shadow: 0 10px 20px -15px rgba(0, 0, 0, .35), 0 22px 40px -15px rgba(0, 0, 0, .20);
+  margin-right: var(--spacing-m);
+}
+.album.rotating {
+  animation: rotate infinite 15s linear;
 }
 
-.overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  background: rgba(255, 255, 255, 0.7);
-  opacity: 1;
-  transition: opacity 0.2s ease-in-out;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.overlay svg {
-  background: white;
-  fill: currentColor;
+.album canvas {
+  border: 10px solid white;
+  border-radius: var(--spacing);
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  cursor: pointer;
 }
+
 .song-title {
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 900;
-  margin-top: var(--spacing);
+  margin: var(--spacing) 0;
   letter-spacing: 2px;
 }
 
-.controls {
-  width: 300px;
-  margin: 0 auto;
-  margin-top: 30px;
+.progress {
+  width: 100%;
 }
 
-.progress {
-  width: 300px;
-  margin: 0 auto;
+.controls {
+  width: 400px;
+  margin-top: var(--spacing-m);
 }
 
 button {
@@ -96,14 +88,13 @@ button {
   background: transparent;
   border: none;
   border-radius: 50%;
-  width: 70px;
-  height: 70px;
   cursor: pointer;
-  transition: color 0.2s ease-in-out, transform 0.2s ease-in-out;;
+  transition: color 0.2s ease-in-out, transform 0.2s ease-in-out;
+  margin: 0;
+  padding: 0;
 }
 
 button:hover {
-  xtransform: scale(1.2);
   color: var(--primary_light);
 }
 
@@ -128,18 +119,13 @@ button.active > svg.no {
 #btnPlayForever.active, #btnFave.active {
   color: var(--tertiary_light);
 }
-canvas {
-  transition: transform 0.2s ease-in-out;
-}
-.previous canvas:hover, .next canvas:hover {
-  transform: scale(1.1);
-}
 
 .waves {
   position: absolute;
   bottom: 0;
   width: 100vw;
   z-index: -1;
+  fill-opacity: 0.5;
 }
 .waves > svg > path:first-of-type {
   fill: var(--primary_light);
@@ -147,16 +133,22 @@ canvas {
 .waves > svg > path:last-of-type {
   fill: var(--tertiary_light);
 }
+
+.current-time, .total-time {
+  font-size: 12px;
+}
+
 progress {
   -webkit-appearance: none;
   border: none;
   box-shadow: none;
   height: 4px;
+  width: 100%;
 }
 
 /* Background. */
 progress::-webkit-progress-bar {
-  background: #ddd;
+  background:var(--background);
   border: none;
   box-shadow: none;
 }
@@ -166,4 +158,13 @@ progress::-webkit-progress-value {
   border: none;
   box-shadow: none;
   background: var(--primary_dark);
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

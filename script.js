@@ -1,20 +1,7 @@
 const player = new core.SoundFontPlayer('https://storage.googleapis.com/download.magenta.tensorflow.org/soundfonts_js/salamander');
 const allData = [];  // [ {fileName, sequence} ]
 let currentSongIndex;
-const canvasData = [
-  { // Previous.
-    canvas: new p5(sketch, document.querySelector('.previous .canvas-container')),
-    size: 100
-  },
-  { // Current.
-    canvas: new p5(sketch, document.querySelector('.current .canvas-container')),
-    size: 300
-  },
-  {  // Next.
-    canvas: new p5(sketch, document.querySelector('.next .canvas-container')),
-    size: 100
-  }
-];
+const canvas =  new p5(sketch, document.querySelector('.canvas-container'));
 
 // FML, these p5 canvases are async?
 setTimeout(init, 100);
@@ -79,12 +66,8 @@ function setCurrentSong(index, startPlaying = false) {
   });
 
   // Set up the album art.
-  // Previous.
-  updateCanvas(allData[index - 1], 0);
   // Current.
-  updateCanvas(allData[index], 1);
-  // Next.
-  updateCanvas(allData[index + 1], 2);
+  updateCanvas(allData[index]);
 }
 
 /*
@@ -95,6 +78,7 @@ function playOrPause(event) {
     stopPlayer();
   } else {
     event.target.classList.toggle('active');
+    document.querySelector('.album').classList.add('rotating');
     player.start(allData[currentSongIndex].sequence).then(() => {
       // If this song is over, go to the next one.
       if (document.getElementById('btnPlayForever').classList.contains('active')) {
@@ -115,10 +99,13 @@ function playForever(event) {
   event.target.classList.toggle('active');
 }
 
-
+/*
+ * Helpers.
+ */
 function stopPlayer() {
   player.stop();
   document.getElementById('btnPlay').classList.remove('active');
+  document.querySelector('.album').classList.remove('rotating');
   document.querySelector('.current-time').textContent = '0:00';
   document.querySelector('progress').value = 0;
 }
@@ -139,14 +126,10 @@ function previousSong() {
   }
 }
 
-
-/*
- * Helpers.
- */
 function updateCanvas(songData, index) {
   const shortFileName = songData.fileName.replace('./midi/', '');
-  document.querySelectorAll('.song-title')[index].textContent = shortFileName;
-  canvasData[index].canvas.drawAlbum(canvasData[index].size, songData.sequence);
+  document.querySelector('.song-title').textContent = shortFileName;
+  canvas.drawAlbum(songData.sequence);
 }
 
 function getRandomMidiFilename() {
@@ -172,15 +155,15 @@ function sketch(p) {
   const FOURTH_LIGHT = '#d4d8f0';
   const PRIMARY_DARK = '#232946';
   const COLORS = [SECONDARY_LIGHT, PRIMARY_LIGHT, TERTIARY_LIGHT, PRIMARY_DARK, FOURTH_LIGHT, BLACK];
+  const CANVAS_SIZE = 300;
 
   p.setup = function() {
-    p.createCanvas(10, 10);
+    p.createCanvas(CANVAS_SIZE, CANVAS_SIZE);
     p.rectMode(p.CENTER);
     p.noLoop();
   };
 
-  p.drawAlbum = function(size, ns) {
-    p.resizeCanvas(size, size);
+  p.drawAlbum = function(ns) {
     p.background(BACKGROUND);
 
     const maxVelocity = Math.max(...ns.notes.map(n => n.velocity));
