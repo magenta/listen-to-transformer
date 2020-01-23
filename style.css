@@ -1,6 +1,6 @@
-* {box-sizing: border-box; }
-[hidden] {display: none !important;}
-
+* {box-sizing: border-box}
+[hidden] {display: none !important}
+[disabled] {pointer-events:none; opacity: 0.3}
 body {
   --background: #f2f4f6;
   --primary_light: #f582ae;
@@ -81,6 +81,11 @@ h1, h2, h3 {
   margin: 30px auto;
 }
 
+.progress {
+  width: 300px;
+  margin: 0 auto;
+}
+
 button {
   display:block;
   color: var(--primary_dark);
@@ -94,7 +99,7 @@ button {
 }
 
 button:hover {
-  transform: scale(1.2);
+  xtransform: scale(1.2);
   color: var(--primary_light);
 }
 
@@ -115,9 +120,35 @@ button:not(.active) > svg.yes,
 button.active > svg.no {
   display: none;
 }
+
+#btnPlayForever.active, #btnFave.active {
+  color: var(--tertiary_light);
+}
 canvas {
   transition: transform 0.2s ease-in-out;
 }
 .previous canvas:hover, .next canvas:hover {
   transform: scale(1.1);
+}
+
+progress {
+  -webkit-appearance: none;
+  border: none;
+  box-shadow: none;
+  height: 4px;
+}
+
+
+/* Background. */
+progress::-webkit-progress-bar {
+  background: #ddd;
+  border: none;
+  box-shadow: none;
+}
+
+/* Value. */
+progress::-webkit-progress-value {
+  border: none;
+  box-shadow: none;
+  background: var(--primary_dark);
 }

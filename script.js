@@ -24,9 +24,19 @@ function init() {
   document.getElementById('btnPlay').addEventListener('click', playOrPause);
   document.getElementById('btnSave').addEventListener('click', saveSong);
   document.getElementById('btnFave').addEventListener('click', faveOrUnfaveSong);
-  document.getElementById('btnNext').addEventListener('click', nextSong);
-  document.getElementById('btnPrevious').addEventListener('click', previousSong);
+  document.getElementById('btnNext').addEventListener('click', () => nextSong());
+  document.getElementById('btnPrevious').addEventListener('click', () => previousSong());
+  document.getElementById('btnPlayForever').addEventListener('click', playForever);
 
+  const progressBar = document.querySelector('progress');
+  const currentTime = document.querySelector('.current-time');
+  player.callbackObject = {
+    run: (note) => {
+      progressBar.value = note.startTime;
+      currentTime.textContent = formatSeconds(Math.round(note.startTime));
+    },
+    stop: () => {}
+  }
   // Get the first 3 songs and update the view when ready.
   Promise.all([getSong(), getSong(), getSong(), getSong()])
   .then(() => {
@@ -48,10 +58,27 @@ async function getSong() {
   });
 }
 
-function setCurrentSong(index) {
+function setCurrentSong(index, startPlaying = false) {
   currentSongIndex = index;
-  player.loadSamples(allData[index].sequence);
+  const sequence = allData[index].sequence;
 
+  // Set up the progress bar.
+  const seconds = Math.round(sequence.totalTime);
+  const totalTime = formatSeconds(seconds);
+  document.querySelector('.total-time').textContent = totalTime;
+
+  const progressBar = document.querySelector('progress');
+  progressBar.max = seconds;
+  progressBar.value = 0;
+
+  // Get ready for playing, and start playing if we need to.
+  player.loadSamples(sequence).then(() => {
+    if (startPlaying) {
+      player.start(sequence);
+    }
+  });
+
+  // Set up the album art.
   // Previous.
   updateCanvas(allData[index - 1], 0);
   // Current.
@@ -60,6 +87,62 @@ function setCurrentSong(index) {
   updateCanvas(allData[index + 1], 2);
 }
 
+/*
+ * Event listeners.
+ */
+function playOrPause(event) {
+  if (player.isPlaying()) {
+    stopPlayer();
+  } else {
+    event.target.classList.toggle('active');
+    player.start(allData[currentSongIndex].sequence).then(() => {
+      // If this song is over, go to the next one.
+      if (document.getElementById('btnPlayForever').classList.contains('active')) {
+        nextSong(true);
+      }
+    });
+  }
+}
+
+function saveSong(event) {
+}
+
+function faveOrUnfaveSong(event) {
+  event.target.classList.toggle('active');
+}
+
+function playForever(event) {
+  event.target.classList.toggle('active');
+}
+
+
+function stopPlayer() {
+  player.stop();
+  document.getElementById('btnPlay').classList.remove('active');
+  document.querySelector('.current-time').textContent = '0:00';
+  document.querySelector('progress').value = 0;
+}
+
+function nextSong(startPlaying = false) {
+  stopPlayer();
+  getSong().then(() => setCurrentSong(currentSongIndex + 1, startPlaying));
+}
+
+function previousSong() {
+  stopPlayer();
+
+  // Loop around if we're at the beginning of the list.
+  if (currentSongIndex === 1) {
+    setCurrentSong(allData.length - 2);
+  } else {
+    setCurrentSong(currentSongIndex - 1);
+  }
+}
+
+
+/*
+ * Helpers.
+ */
 function updateCanvas(songData, index) {
   const shortFileName = songData.fileName.replace('./midi/', '');
   document.querySelectorAll('.song-title')[index].textContent = shortFileName;
@@ -72,36 +155,14 @@ function getRandomMidiFilename() {
   return `./midi/${tempFiles[index]}.mid`;
 }
 
-function playOrPause(event) {
-  event.target.classList.toggle('active');
-
-  if (player.isPlaying()) {
-    player.stop();
-  } else {
-    player.start(allData[currentSongIndex].sequence);
-  }
+// From https://stackoverflow.com/questions/3733227/javascript-seconds-to-minutes-and-seconds.
+function formatSeconds(s) {
+  return(s-(s%=60))/60+(9<s?':':':0')+s;
 }
 
-function nextSong() {
-  getSong().then(() => setCurrentSong(currentSongIndex + 1));
-}
-
-function previousSong() {
-  // Loop around if we're at the beginning of the list.
-  if (currentSongIndex === 1) {
-    setCurrentSong(allData.length - 2);
-  } else {
-    setCurrentSong(currentSongIndex - 1);
-  }
-}
-
-function saveSong(event) {
-}
-
-function faveOrUnfaveSong(event) {
-  event.target.classList.toggle('active');
-}
-
+/*
+ * Album art
+ */
 function sketch(p) {
   const BLACK = 0;
   const BACKGROUND = '#f2f4f6';
