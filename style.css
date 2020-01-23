@@ -13,14 +13,12 @@ body {
   margin: 0;
   background: var(--background);
   color: var(--primary_dark);
-  font-family: 'Open Sans', sans-serif;
+  font-family: 'Work Sans', sans-serif;
   text-align: center;
-  letter-spacing: 2px;
 }
 
 h1, h2, h3 {
   font-weight: lighter;
-  font-family: 'Open Sans Condensed', sans-serif;
 }
 
 .vertical {
@@ -75,6 +73,7 @@ h1, h2, h3 {
   font-size: 14px;
   font-weight: 900;
   margin-top: var(--spacing);
+  letter-spacing: 2px;
 }
 
 .controls {

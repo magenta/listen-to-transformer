@@ -1,86 +1,75 @@
 const player = new core.SoundFontPlayer('https://storage.googleapis.com/download.magenta.tensorflow.org/soundfonts_js/salamander');
-
-// [previous, current, next]
-const PREVIOUS = 0;
-const CURRENT = 1;
-const NEXT = 2;
-const currentView = [
-  {
+const allData = [];  // [ {fileName, sequence} ]
+let currentSongIndex;
+const canvasData = [
+  { // Previous.
     canvas: new p5(sketch, document.querySelector('.previous .canvas-container')),
-    size: 100,
-    sequence: null,
-    fileName: null
+    size: 100
   },
-  {
+  { // Current.
     canvas: new p5(sketch, document.querySelector('.current .canvas-container')),
-    size: 300,
-    sequence: null,
-    fileName: null
+    size: 300
   },
-  {
+  {  // Next.
     canvas: new p5(sketch, document.querySelector('.next .canvas-container')),
-    size: 100,
-    sequence: null,
-    fileName: null
+    size: 100
   }
 ];
-const data = [];
 
 // FML, these p5 canvases are async?
 setTimeout(init, 100);
 
-document.getElementById('btnPlay').addEventListener('click', playOrPause);
-document.getElementById('btnSave').addEventListener('click', save);
-document.getElementById('btnFave').addEventListener('click', fave);
-
 function init() {
-  Promise.all([getSong(), getSong(), getSong()])
+  // Event listeners.
+  document.getElementById('btnPlay').addEventListener('click', playOrPause);
+  document.getElementById('btnSave').addEventListener('click', saveSong);
+  document.getElementById('btnFave').addEventListener('click', faveOrUnfaveSong);
+  document.getElementById('btnNext').addEventListener('click', nextSong);
+  document.getElementById('btnPrevious').addEventListener('click', previousSong);
+
+  // Get the first 3 songs and update the view when ready.
+  Promise.all([getSong(), getSong(), getSong(), getSong()])
   .then(() => {
-    setCurrentSong(CURRENT);
+    setCurrentSong(1);
   });
 }
 
 async function getSong() {
   return new Promise((resolve, reject) => {
-    const thisOne = {};
-    data.push(thisOne);
+    const songData = {};
+    allData.push(songData);
 
-    const fileName = getRandomMidiFilename();
-    thisOne.fileName = fileName;
-
-    core.urlToNoteSequence(fileName).then((ns) => {
+    songData.fileName =  getRandomMidiFilename();
+    core.urlToNoteSequence(songData.fileName).then((ns) => {
       const quantized = core.sequences.quantizeNoteSequence(ns, 4);
-      thisOne.sequence = quantized;
-      player.loadSamples(quantized);
+      songData.sequence = quantized;
       resolve();
     });
   });
 }
 
 function setCurrentSong(index) {
+  currentSongIndex = index;
+  player.loadSamples(allData[index].sequence);
 
-  const thisOne = data[index];
-
-  const fileName = filePath.replace('./midi/', '');
-  document.querySelectorAll('.song-title')[index].textContent = fileName;
-  thisOne.fileName = fileName;
-  fileHistory.push = filePath;
- thisOne.sequence = quantized;
-    thisOne.canvas.drawAlbum(thisOne.size, quantized);
+  // Previous.
+  updateCanvas(allData[index - 1], 0);
+  // Current.
+  updateCanvas(allData[index], 1);
+  // Next.
+  updateCanvas(allData[index + 1], 2);
 }
 
+function updateCanvas(songData, index) {
+  const shortFileName = songData.fileName.replace('./midi/', '');
+  document.querySelectorAll('.song-title')[index].textContent = shortFileName;
+  canvasData[index].canvas.drawAlbum(canvasData[index].size, songData.sequence);
+}
 
 function getRandomMidiFilename() {
   const tempFiles = [7425, 7426, 74110, 74252, 74257, 37758];
   const index = Math.floor(Math.random() * tempFiles.length);
   return `./midi/${tempFiles[index]}.mid`;
-
-  // TODO: this should go back in when it can fetch these files.
-  // const prefix = 'https://iansimon.users.x20web.corp.google.com/piano_transformer_radio';
-  // const index = Math.floor(Math.random() * 99999);
-  // return index < 50000 ?
-  //     `${prefix}/midi0_4/${index}.mid` :
-  //     `${prefix}/midi5_9/${index}.mid`;
 }
 
 function playOrPause(event) {
@@ -89,28 +78,27 @@ function playOrPause(event) {
   if (player.isPlaying()) {
     player.stop();
   } else {
-    player.start(data[CURRENT].sequence);
+    player.start(allData[currentSongIndex].sequence);
   }
 }
 
 function nextSong() {
-  getSong()
-  // current -> next
-  // previous -> current
-  // next -> new
-
+  getSong().then(() => setCurrentSong(currentSongIndex + 1));
 }
 
 function previousSong() {
-  // current -> previous
-  // next -> current
-  // previous -> new
+  // Loop around if we're at the beginning of the list.
+  if (currentSongIndex === 1) {
+    setCurrentSong(allData.length - 2);
+  } else {
+    setCurrentSong(currentSongIndex - 1);
+  }
 }
 
-function save(event) {
+function saveSong(event) {
 }
 
-function fave(event) {
+function faveOrUnfaveSong(event) {
   event.target.classList.toggle('active');
 }
 

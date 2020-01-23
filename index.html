@@ -7,8 +7,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/13.8.25/Tone.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@magenta/music@^1.0.0/es6/core.js"></script>
-
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:900|Open+Sans+Condensed:300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Work+Sans:400,700&display=swap" rel="stylesheet">
   </head>
   <body>
     <div class="vertical main">
@@ -19,7 +18,7 @@
           <div class="album">
             <div class="canvas-container"></div>
             <div class="overlay">
-              <button alt="go to the previous song">
+              <button alt="go to the previous song" id="btnPrevious">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
               </button>
             </div>
@@ -36,7 +35,7 @@
           <div class="album">
             <div class="canvas-container"></div>
             <div class="overlay">
-              <button alt="go to the next song">
+              <button alt="go to the next song" id="btnNext">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
               </button>
             </div>
