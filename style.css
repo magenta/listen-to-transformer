@@ -20,6 +20,9 @@ body {
   font-family: 'Work Sans', sans-serif;
 }
 
+/*
+ * Main layout.
+ */
 h1 {
   text-align: center;
   position: relative;
@@ -27,21 +30,18 @@ h1 {
   font-size: 60px;
   letter-spacing: 4px;
 }
-
 .vertical {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: stretch;
 }
-
 .horizontal {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
 }
-
 .box {
   position: relative;
   background: white;
@@ -52,6 +52,9 @@ h1 {
   box-shadow: 0 30px 56px 6px rgba(0, 0, 0, 0.1);
 }
 
+/*
+ * Album art.
+ */
 .album {
   position: relative;
   margin-right: var(--spacing-m);
@@ -59,29 +62,58 @@ h1 {
 .album.rotating {
   animation: rotate infinite 15s linear;
 }
-
+@keyframes rotate {
+  from { transform: rotate(0) }
+  to   { transform: rotate(360deg) }
+}
 .album canvas {
   border: 10px solid white;
   border-radius: var(--spacing);
   border-radius: 50%;
 }
 
+/*
+ * Current song information.
+ */
 .song-title {
   font-size: 18px;
   font-weight: 900;
   margin: var(--spacing) 0;
   letter-spacing: 2px;
 }
-
 .progress {
   width: 100%;
 }
+.current-time, .total-time {
+  font-size: 12px;
+}
+progress {
+  -webkit-appearance: none;
+  border: none;
+  box-shadow: none;
+  height: 4px;
+  width: 100%;
+}
+/* Background. */
+progress::-webkit-progress-bar {
+  background:var(--background);
+  border: none;
+  box-shadow: none;
+}
+/* Value. */
+progress::-webkit-progress-value {
+  border: none;
+  box-shadow: none;
+  background: var(--primary_dark);
+}
 
+/*
+ * Play controls.
+ */
 .controls {
   width: 400px;
   margin-top: var(--spacing-m);
 }
-
 button {
   display:block;
   color: var(--primary_dark);
@@ -93,11 +125,9 @@ button {
   margin: 0;
   padding: 0;
 }
-
 button:hover {
   color: var(--primary_light);
 }
-
 button svg {
   pointer-events: none;
   fill: currentColor;
@@ -105,21 +135,21 @@ button svg {
   height: 40px;
   margin: 0 auto;
 }
-
 button.active > svg.yes,
 button:not(.active) > svg.no {
   display: block;
 }
-
 button:not(.active) > svg.yes,
 button.active > svg.no {
   display: none;
 }
-
 #btnPlayForever.active, #btnFave.active {
   color: var(--tertiary_light);
 }
 
+/*
+ * Bottom waves.
+ */
 .waves {
   position: absolute;
   bottom: 0;
@@ -132,39 +162,4 @@ button.active > svg.no {
 }
 .waves > svg > path:last-of-type {
   fill: var(--tertiary_light);
-}
-
-.current-time, .total-time {
-  font-size: 12px;
-}
-
-progress {
-  -webkit-appearance: none;
-  border: none;
-  box-shadow: none;
-  height: 4px;
-  width: 100%;
-}
-
-/* Background. */
-progress::-webkit-progress-bar {
-  background:var(--background);
-  border: none;
-  box-shadow: none;
-}
-
-/* Value. */
-progress::-webkit-progress-value {
-  border: none;
-  box-shadow: none;
-  background: var(--primary_dark);
-}
-
-@keyframes rotate {
-  from {
-    transform: rotate(0);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }
