@@ -48,7 +48,7 @@ h1 {
   padding: var(--spacing) var(--spacing-m);
   border-radius: var(--spacing);
   margin: 200px auto;
-  height:200px;
+  height: 200px;
   box-shadow: 0 30px 56px 6px rgba(0, 0, 0, 0.1);
 }
 
@@ -112,7 +112,7 @@ progress::-webkit-progress-value {
  */
 .controls {
   width: 400px;
-  margin-top: var(--spacing-m);
+  margin: var(--spacing-m) 0;
 }
 button {
   display:block;
@@ -162,4 +162,25 @@ button.active > svg.no {
 }
 .waves > svg > path:last-of-type {
   fill: var(--tertiary_light);
+}
+
+/*
+ * Small screens.
+ */
+@media only screen and (max-width: 600px)  {
+  .box {
+    flex-direction: column;
+    height: 300px;
+  }
+  canvas {
+    width: 200px !important;
+    height: 200px !important;
+  }
+  .album {
+    margin-top: -100px;
+    margin-right: 0;
+  }
+  .controls {
+    width: 70vw;
+  }
 }
