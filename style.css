@@ -42,13 +42,15 @@ h1 {
   justify-content: space-between;
   align-items: center;
 }
+
 .box {
   position: relative;
   background: white;
   padding: var(--spacing) var(--spacing-m);
-  border-radius: var(--spacing);
   margin: 200px auto;
+  margin-bottom: 0;
   height: 200px;
+  border-radius: var(--spacing);
   box-shadow: 0 30px 56px 6px rgba(0, 0, 0, 0.1);
 }
 
@@ -111,6 +113,7 @@ progress::-webkit-progress-value {
  * Play controls.
  */
 .controls {
+  position: relative;
   width: 400px;
   margin: var(--spacing-m) 0;
 }
@@ -124,6 +127,9 @@ button {
   transition: color 0.2s ease-in-out, transform 0.2s ease-in-out;
   margin: 0;
   padding: 0;
+  font-weight: bold;
+  font-family: inherit;
+  font-size: inherit;
 }
 button:hover {
   color: var(--primary_light);
@@ -143,10 +149,53 @@ button:not(.active) > svg.yes,
 button.active > svg.no {
   display: none;
 }
-#btnPlayForever.active, #btnFave.active {
+#btnPlayForever.active,
+#btnFave.active,
+#btnPlaylist.active {
   color: var(--tertiary_light);
 }
 
+/*
+ * Playlist.
+ */
+.playlist {
+  position: absolute;
+  background: white;
+  border-radius: var(--spacing);
+  height: 0;
+  right: 0;
+  top: calc(200px - 20px);  /* this is the same as the height set in .box and spacing*/
+  left: 300px; /* width of canvas + a bit */
+  padding: var(--spacing-m);
+  visibility: hidden;
+  transition: height 0.2s ease-in-out, visibility 0.2s ease-in-out;
+}
+.playlist.showing {
+  height: 300px;
+  visibility: visible;
+  transition: height 0.2s ease-in-out, visibility 0.2s ease-in-out;
+  overflow: auto;
+}
+.playlist ul {
+  display: none;
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+.playlist.showing ul {
+  display: block;
+}
+.playlist ul li {
+  padding: var(--spacing) var(--spacing-m);
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+.playlist ul li:hover {
+  background: var(--background);
+}
 /*
  * Bottom waves.
  */
@@ -154,7 +203,7 @@ button.active > svg.no {
   position: absolute;
   bottom: 0;
   width: 100vw;
-  z-index: -1;
+  z-index: -2;
   fill-opacity: 0.5;
 }
 .waves > svg > path:first-of-type {

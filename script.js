@@ -1,7 +1,9 @@
+const FILE_PREFIX = './midi/';
 const player = new core.SoundFontPlayer('https://storage.googleapis.com/download.magenta.tensorflow.org/soundfonts_js/salamander');
-const allData = [];  // [ {fileName, sequence} ]
+const allData = [];  // [ {path, fileName, sequence} ]
 let currentSongIndex;
 const canvas =  new p5(sketch, document.querySelector('.canvas-container'));
+const HAS_LOCAL_STORAGE = typeof(Storage) !== 'undefined';
 
 // FML, these p5 canvases are async?
 setTimeout(init, 100);
@@ -11,9 +13,11 @@ function init() {
   document.getElementById('btnPlay').addEventListener('click', playOrPause);
   document.getElementById('btnSave').addEventListener('click', saveSong);
   document.getElementById('btnFave').addEventListener('click', faveOrUnfaveSong);
+  document.getElementById('btnPlayForever').addEventListener('click', playForever);
+  document.getElementById('btnPlaylist').addEventListener('click', togglePlaylist);
   document.getElementById('btnNext').addEventListener('click', () => nextSong());
   document.getElementById('btnPrevious').addEventListener('click', () => previousSong());
-  document.getElementById('btnPlayForever').addEventListener('click', playForever);
+
 
   const progressBar = document.querySelector('progress');
   const currentTime = document.querySelector('.current-time');
@@ -25,24 +29,24 @@ function init() {
     stop: () => {}
   }
   // Get the first 3 songs and update the view when ready.
-  Promise.all([getSong(), getSong(), getSong(), getSong()])
+  Promise.all([getSong(), getSong()])
   .then(() => {
     setCurrentSong(1);
   });
 }
 
-async function getSong() {
-  return new Promise((resolve, reject) => {
-    const songData = {};
-    allData.push(songData);
-
-    songData.fileName =  getRandomMidiFilename();
-    core.urlToNoteSequence(songData.fileName).then((ns) => {
-      const quantized = core.sequences.quantizeNoteSequence(ns, 4);
-      songData.sequence = quantized;
-      resolve();
-    });
-  });
+async function getSong(path) {
+  if (!path) {
+    path = getRandomMidiFilename();
+  }
+  const songData = {};
+  allData.push(songData);
+  songData.path = path;
+  songData.fileName = songData.path.replace(FILE_PREFIX, '');
+  const ns = await core.urlToNoteSequence(path);
+  const quantized = core.sequences.quantizeNoteSequence(ns, 4);
+  songData.sequence = quantized;
+  return quantized;
 }
 
 function setCurrentSong(index, startPlaying = false) {
@@ -66,8 +70,8 @@ function setCurrentSong(index, startPlaying = false) {
   });
 
   // Set up the album art.
-  // Current.
   updateCanvas(allData[index]);
+  updateFaveButton();
 }
 
 /*
@@ -88,15 +92,60 @@ function playOrPause(event) {
   }
 }
 
-function saveSong(event) {
-}
+function saveSong(event) {}
 
 function faveOrUnfaveSong(event) {
-  event.target.classList.toggle('active');
+  const btn = event.target;
+  if (btn.classList.contains('active')) {
+    btn.classList.remove('active');
+    removeSongFromPlaylist(allData[currentSongIndex].fileName);
+  } else {
+    btn.classList.add('active');
+    addSongToPlaylist(allData[currentSongIndex].fileName);
+  }
+
+  if (document.querySelector('.playlist').classList.contains('showing')) {
+    refreshPlayListIfVisible();
+  }
 }
 
 function playForever(event) {
   event.target.classList.toggle('active');
+}
+
+function togglePlaylist(event) {
+  event.target.classList.toggle('active');
+  const el = document.querySelector('.playlist');
+  el.classList.toggle('showing');
+  refreshPlayListIfVisible();
+}
+
+function refreshPlayListIfVisible() {
+  if (!document.querySelector('.playlist').classList.contains('showing')) {
+    return;
+  }
+
+  const favesString =  window.localStorage.getItem('faves') || '[]';
+  const faves = JSON.parse(favesString);
+
+  const ul = document.querySelector('.playlist ul');
+  ul.innerHTML = '';
+
+  for (let i = 0; i < faves.length; i++) {
+    const li = document.createElement('li');
+    li.innerHTML = `<div>${faves[i]}</div><button>remove</button>`;
+    ul.appendChild(li);
+    li.onclick = (event) => {
+      if (event.target.localName === 'button') {
+        removeSongFromPlaylist(event.target.previousElementSibling.textContent);
+      } else if (event.target.localName === 'div') {
+        getSong(`${FILE_PREFIX}${event.target.textContent}`).then(
+          () => setCurrentSong(allData.length - 1));
+      } else {
+        console.error('meep');
+      }
+    }
+  }
 }
 
 /*
@@ -126,16 +175,45 @@ function previousSong() {
   }
 }
 
-function updateCanvas(songData, index) {
-  const shortFileName = songData.fileName.replace('./midi/', '');
-  document.querySelector('.song-title').textContent = shortFileName;
+function updateFaveButton() {
+  const btn = document.getElementById('btnFave');
+  const favesString =  window.localStorage.getItem('faves') || '[]';
+  const faves = JSON.parse(favesString);
+
+  // Is the current song a favourite song?
+  if (faves.indexOf(allData[currentSongIndex].fileName) !== -1) {
+    btn.classList.add('active');
+  } else {
+    btn.classList.remove('active');
+  }
+}
+
+function updateCanvas(songData) {
+  document.querySelector('.song-title').textContent = songData.fileName
   canvas.drawAlbum(songData.sequence);
 }
 
 function getRandomMidiFilename() {
   const tempFiles = [7425, 7426, 74110, 74252, 74257, 37758];
   const index = Math.floor(Math.random() * tempFiles.length);
-  return `./midi/${tempFiles[index]}.mid`;
+  return `${FILE_PREFIX}${tempFiles[index]}.mid`;
+}
+
+function addSongToPlaylist(song) {
+  const favesString =  window.localStorage.getItem('faves') || '[]';
+  const faves = JSON.parse(favesString);
+  faves.push(song);
+  window.localStorage.setItem('faves', JSON.stringify(faves));
+  refreshPlayListIfVisible();
+}
+
+function removeSongFromPlaylist(song) {
+  const favesString =  window.localStorage.getItem('faves') || '[]';
+  const faves = JSON.parse(favesString);
+  const index = faves.indexOf(song);
+  faves.splice(index, 1);
+  window.localStorage.setItem('faves', JSON.stringify(faves));
+  refreshPlayListIfVisible();
 }
 
 // From https://stackoverflow.com/questions/3733227/javascript-seconds-to-minutes-and-seconds.
