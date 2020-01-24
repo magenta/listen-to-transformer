@@ -205,12 +205,17 @@ button.active > svg.no {
   width: 100vw;
   z-index: -2;
   fill-opacity: 0.5;
+  xanimation: ebb 30s infinite ease-in-out
 }
 .waves > svg > path:first-of-type {
   fill: var(--primary_light);
 }
 .waves > svg > path:last-of-type {
   fill: var(--tertiary_light);
+}
+@keyframes ebb {
+  0% { transform: scaleY(1) }
+  50%   { transform: scaleY(2) }
 }
 
 /*
@@ -220,6 +225,7 @@ button.active > svg.no {
   .box {
     flex-direction: column;
     height: 300px;
+    margin-top: 150px;
   }
   canvas {
     width: 200px !important;
@@ -231,5 +237,15 @@ button.active > svg.no {
   }
   .controls {
     width: 70vw;
+  }
+  .playlist.showing {
+    left: 0;
+    top: calc(300px - 20px);
+  }
+  .song-title {
+    text-align: center;
+  }
+  .waves {
+    transform: scaleY(4);
   }
 }
