@@ -6,6 +6,7 @@ const STORAGE_KEYS = {FAVES: 'faves', VERSION: 'data_version'};
 const player = new core.SoundFontPlayer('https://storage.googleapis.com/download.magenta.tensorflow.org/soundfonts_js/salamander');
 const allData = [];  // [ {path, fileName, sequence} ]
 let currentSongIndex;
+let secondsElapsed, progressInterval;
 const canvas =  new p5(sketch, document.querySelector('.canvas-container'));
 const HAS_LOCAL_STORAGE = typeof(Storage) !== 'undefined';
 
@@ -20,16 +21,12 @@ function init() {
   document.getElementById('btnHelp').addEventListener('click', toggleHelp);
   document.getElementById('btnNext').addEventListener('click', () => nextSong());
   document.getElementById('btnPrevious').addEventListener('click', () => previousSong());
+  // player.callbackObject = {
+  //   run: (note) => {
 
-  const progressBar = document.querySelector('progress');
-  const currentTime = document.querySelector('.current-time');
-  player.callbackObject = {
-    run: (note) => {
-      progressBar.value = note.startTime;
-      currentTime.textContent = formatSeconds(note.startTime);
-    },
-    stop: () => {}
-  }
+  //   },
+  //   stop: () => {}
+  // }
 
   const hash = window.location.hash.substr(1).trim();
   const initialMidi = hash !== '' ? `${FILE_PREFIX}${hash}` : undefined;
@@ -167,9 +164,11 @@ function pausePlayer(andStop = false) {
     player.stop();
     document.querySelector('.current-time').textContent = '0:00';
     document.querySelector('progress').value = 0;
+    secondsElapsed = 0;
   } else {
     player.pause();
   }
+  clearInterval(progressInterval);
   document.getElementById('btnPlay').classList.remove('active');
   document.querySelector('.album').classList.remove('rotating');
 }
@@ -177,12 +176,22 @@ function pausePlayer(andStop = false) {
 function startPlayer() {
   const state = player.getPlayState();
   if (state === 'stopped') {
+    secondsElapsed = 0;
     player.start(allData[currentSongIndex].sequence).then(nextSong);
   } else {
     player.resume();
   }
+  progressInterval = setInterval(updateProgressBar, 1000);
   document.getElementById('btnPlay').classList.add('active');
   document.querySelector('.album').classList.add('rotating');
+}
+
+const progressBar = document.querySelector('progress');
+const currentTime = document.querySelector('.current-time');
+function updateProgressBar() {
+  secondsElapsed++;
+  progressBar.value = secondsElapsed;
+  currentTime.textContent = formatSeconds(secondsElapsed);
 }
 
 // Next/previous should also start the song.
