@@ -18,15 +18,10 @@ function init() {
   document.getElementById('btnPlay').addEventListener('click', playOrPause);
   document.getElementById('btnFave').addEventListener('click', faveOrUnfaveSong);
   document.getElementById('btnPlaylist').addEventListener('click', togglePlaylist);
+  document.getElementById('btnSave').addEventListener('click', save);
   document.getElementById('btnHelp').addEventListener('click', toggleHelp);
   document.getElementById('btnNext').addEventListener('click', () => nextSong());
   document.getElementById('btnPrevious').addEventListener('click', () => previousSong());
-  // player.callbackObject = {
-  //   run: (note) => {
-
-  //   },
-  //   stop: () => {}
-  // }
 
   const hash = window.location.hash.substr(1).trim();
   const initialMidi = hash !== '' ? `${FILE_PREFIX}${hash}` : undefined;
@@ -90,6 +85,13 @@ function faveOrUnfaveSong(event) {
   }
 }
 
+function save() {
+  const song = allData[currentSongIndex];
+  window.saveAs(
+    new File([window.core.sequenceProtoToMidi(song.sequence)],
+    song.fileName));
+}
+
 function togglePlaylist(event) {
     // If an existing popup is open, close it.
   document.querySelector('.help').classList.remove('showing');
@@ -109,51 +111,6 @@ function toggleHelp(event) {
   event.target.classList.toggle('active');
   const el = document.querySelector('.help');
   el.classList.toggle('showing');
-}
-
-function refreshPlayListIfVisible() {
-  if (!HAS_LOCAL_STORAGE ||
-    !document.querySelector('.playlist').classList.contains('showing')) {
-    return;
-  }
-
-  const faves = getFromLocalStorage(STORAGE_KEYS.FAVES);
-  const ul = document.querySelector('.playlist ul');
-  ul.innerHTML = '';
-
-  // Header.
-  const li = document.createElement('li');
-  li.className = 'list-header';
-  li.innerHTML = `<div>title</div><div>length</div><div></div>`;
-  ul.appendChild(li);
-
-  for (let i = 0; i < faves.length; i++) {
-    const li = document.createElement('li');
-    li.innerHTML = `
-    <div>${faves[i].name}</div>
-    <div>${faves[i].totalTime}</div>
-    <div class="horizontal">
-      <button alt="play song" class="play" data-filename=${faves[i].name}>
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-      </button>
-      <button alt="un-favourite song" class="remove" data-index=${i}>
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-      </button>
-    </div>`;
-
-    ul.appendChild(li);
-    li.onclick = (event) => {
-      const className = event.target.className;
-      if (className === 'remove') {
-        document.getElementById('btnFave').classList.remove('active');
-        removeSongFromPlaylist(event.target.dataset.index);
-      } else if (className === 'play') {
-
-        getSong(`${FILE_PREFIX}${event.target.dataset.filename}`).then(
-          () => changeSong(allData.length - 1));
-      }
-    }
-  }
 }
 
 /*
@@ -249,15 +206,49 @@ function updateFaveButton() {
   }
 }
 
-function updateCanvas(songData) {
-  document.querySelector('.song-title').textContent = songData.fileName
-  canvas.drawAlbum(songData.sequence);
-}
+function refreshPlayListIfVisible() {
+  if (!HAS_LOCAL_STORAGE ||
+    !document.querySelector('.playlist').classList.contains('showing')) {
+    return;
+  }
 
-function getRandomMidiFilename() {
-  const numFiles = 99975;
-  const index = Math.floor(Math.random() * numFiles);
-  return `${FILE_PREFIX}${index}.mid`;
+  const faves = getFromLocalStorage(STORAGE_KEYS.FAVES);
+  const ul = document.querySelector('.playlist ul');
+  ul.innerHTML = '';
+
+  // Header.
+  const li = document.createElement('li');
+  li.className = 'list-header';
+  li.innerHTML = `<div>title</div><div>length</div><div></div>`;
+  ul.appendChild(li);
+
+  for (let i = 0; i < faves.length; i++) {
+    const li = document.createElement('li');
+    li.innerHTML = `
+    <div>${faves[i].name}</div>
+    <div>${faves[i].totalTime}</div>
+    <div class="horizontal">
+      <button title="play song" class="play" data-filename=${faves[i].name}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+      <button title="un-favourite song" class="remove" data-index=${i}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+      </button>
+    </div>`;
+
+    ul.appendChild(li);
+    li.onclick = (event) => {
+      const className = event.target.className;
+      if (className === 'remove') {
+        document.getElementById('btnFave').classList.remove('active');
+        removeSongFromPlaylist(event.target.dataset.index);
+      } else if (className === 'play') {
+
+        getSong(`${FILE_PREFIX}${event.target.dataset.filename}`).then(
+          () => changeSong(allData.length - 1));
+      }
+    }
+  }
 }
 
 function addSongToPlaylist(index) {
@@ -280,6 +271,17 @@ function removeSongFromPlaylist(index) {
   refreshPlayListIfVisible();
 }
 
+function updateCanvas(songData) {
+  document.querySelector('.song-title').textContent = songData.fileName
+  canvas.drawAlbum(songData.sequence);
+}
+
+function getRandomMidiFilename() {
+  const numFiles = 99975;
+  const index = Math.floor(Math.random() * numFiles);
+  return `${FILE_PREFIX}${index}.mid`;
+}
+
 function getFromLocalStorage(key) {
   return JSON.parse(window.localStorage.getItem(key) || '[]');
 }
@@ -293,8 +295,9 @@ function formatSeconds(s) {
   s = Math.round(s);
   return(s-(s%=60))/60+(9<s?':':':0')+s;
 }
+
 /*
- * Album art
+ * Album art.
  */
 function sketch(p) {
   const BLACK = 0;
