@@ -57,7 +57,7 @@ h1 {
   display: block;
   content: 'transformer.fm';
   font-size: 40px;
-  font-weight: light;
+  font-weight: lighter;
   letter-spacing: 2px;
   position: absolute;
   top: -80px;
@@ -243,6 +243,7 @@ button.active > svg.no {
     margin-top: 200px;
   }
   .box::before {
+    right: auto;
     top: -140px;
   }
   canvas {
