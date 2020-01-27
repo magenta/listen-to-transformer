@@ -1,4 +1,7 @@
 const FILE_PREFIX = 'https://magentadata.storage.googleapis.com/piano_transformer_midi/';
+// Update this if the format we store the data into local storage has changed.
+const STORAGE_VERSION = '0.0.1';
+const STORAGE_KEYS = {FAVES: 'faves', VERSION: 'data_version'};
 
 const player = new core.SoundFontPlayer('https://storage.googleapis.com/download.magenta.tensorflow.org/soundfonts_js/salamander');
 const allData = [];  // [ {path, fileName, sequence} ]
@@ -23,7 +26,7 @@ function init() {
   player.callbackObject = {
     run: (note) => {
       progressBar.value = note.startTime;
-      currentTime.textContent = formatSeconds(Math.round(note.startTime));
+      currentTime.textContent = formatSeconds(note.startTime);
     },
     stop: () => {}
   }
@@ -33,14 +36,19 @@ function init() {
 
   // Get a current song and a previous song so that we can click previous, i guess.
   Promise.all([getSong(), getSong(initialMidi)])
-  .then(() => {
-    setCurrentSong(1);
-  });
+  .then(() => changeSong(1, true));
 
   // If we don't have local storage, we don't have playlists.
   if (!HAS_LOCAL_STORAGE) {
     document.getElementById('btnFave').hidden = true;
     document.getElementById('btnPlaylist').hidden = true;
+  } else {
+    // Check if we have to nuke the playlists because they're in the wrong format.
+    const version = getFromLocalStorage(STORAGE_KEYS.VERSION);
+    if (version !== STORAGE_VERSION) {
+      window.localStorage.clear();
+      saveToLocalStorage(STORAGE_KEYS.VERSION, STORAGE_VERSION);
+    }
   }
 }
 
@@ -56,33 +64,6 @@ async function getSong(path) {
   const quantized = core.sequences.quantizeNoteSequence(ns, 4);
   songData.sequence = quantized;
   return quantized;
-}
-
-function setCurrentSong(index, startPlaying = false) {
-  currentSongIndex = index;
-  window.location.hash = allData[index].fileName;
-
-  const sequence = allData[index].sequence;
-
-  // Set up the progress bar.
-  const seconds = Math.round(sequence.totalTime);
-  const totalTime = formatSeconds(seconds);
-  document.querySelector('.total-time').textContent = totalTime;
-
-  const progressBar = document.querySelector('progress');
-  progressBar.max = seconds;
-  progressBar.value = 0;
-
-  // Get ready for playing, and start playing if we need to.
-  player.loadSamples(sequence).then(() => {
-    if (startPlaying) {
-      startPlayer();
-    }
-  });
-
-  // Set up the album art.
-  updateCanvas(allData[index]);
-  updateFaveButton();
 }
 
 /*
@@ -101,10 +82,10 @@ function faveOrUnfaveSong(event) {
   const btn = event.target;
   if (btn.classList.contains('active')) {
     btn.classList.remove('active');
-    removeSongFromPlaylist(allData[currentSongIndex].fileName);
+    removeSongFromPlaylist(currentSongIndex);
   } else {
     btn.classList.add('active');
-    addSongToPlaylist(allData[currentSongIndex].fileName);
+    addSongToPlaylist(currentSongIndex);
   }
 
   if (document.querySelector('.playlist').classList.contains('showing')) {
@@ -139,24 +120,40 @@ function refreshPlayListIfVisible() {
     return;
   }
 
-  const favesString =  window.localStorage.getItem('faves') || '[]';
-  const faves = JSON.parse(favesString);
-
+  const faves = getFromLocalStorage(STORAGE_KEYS.FAVES);
   const ul = document.querySelector('.playlist ul');
   ul.innerHTML = '';
 
+  // Header.
+  const li = document.createElement('li');
+  li.className = 'list-header';
+  li.innerHTML = `<div>title</div><div>length</div><div></div>`;
+  ul.appendChild(li);
+
   for (let i = 0; i < faves.length; i++) {
     const li = document.createElement('li');
-    li.innerHTML = `<div>${faves[i]}</div><button>remove</button>`;
+    li.innerHTML = `
+    <div>${faves[i].name}</div>
+    <div>${faves[i].totalTime}</div>
+    <div class="horizontal">
+      <button alt="play song" class="play" data-filename=${faves[i].name}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+      <button alt="un-favourite song" class="remove" data-index=${i}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+      </button>
+    </div>`;
+
     ul.appendChild(li);
     li.onclick = (event) => {
-      if (event.target.localName === 'button') {
-        removeSongFromPlaylist(event.target.previousElementSibling.textContent);
-      } else if (event.target.localName === 'div') {
-        getSong(`${FILE_PREFIX}${event.target.textContent}`).then(
-          () => setCurrentSong(allData.length - 1));
-      } else {
-        console.error('meep');
+      const className = event.target.className;
+      if (className === 'remove') {
+        document.getElementById('btnFave').classList.remove('active');
+        removeSongFromPlaylist(event.target.dataset.index);
+      } else if (className === 'play') {
+
+        getSong(`${FILE_PREFIX}${event.target.dataset.filename}`).then(
+          () => changeSong(allData.length - 1));
       }
     }
   }
@@ -190,29 +187,53 @@ function startPlayer() {
 
 // Next/previous should also start the song.
 function nextSong() {
-  pausePlayer(true);
-  getSong().then(() => setCurrentSong(currentSongIndex + 1, true));
+  getSong().then(() => changeSong(currentSongIndex + 1));
 }
 
 function previousSong() {
+  // Loop around if we're at the beginning of the list.
+  const index = currentSongIndex === 1 ? allData.length - 2 : currentSongIndex - 1;
+  changeSong(index);
+}
+
+function changeSong(index, noAutoplay = false) {
   pausePlayer(true);
 
-  // Loop around if we're at the beginning of the list.
-  if (currentSongIndex === 1) {
-    setCurrentSong(allData.length - 2, true);
-  } else {
-    setCurrentSong(currentSongIndex - 1, true);
-  }
+  // Update to this song.
+  currentSongIndex = index;
+  window.location.hash = allData[index].fileName;
+
+  // Get ready for playing, and start playing if we need to.
+  // This takes the longes so start early.
+  const sequence = allData[index].sequence;
+  player.loadSamples(sequence).then(() => {
+    if (!noAutoplay) {
+      startPlayer();
+    }
+  });
+
+  // Set up the progress bar.
+  const seconds = Math.round(sequence.totalTime);
+  const totalTime = formatSeconds(seconds);
+  document.querySelector('.total-time').textContent = totalTime;
+
+  const progressBar = document.querySelector('progress');
+  progressBar.max = seconds;
+  progressBar.value = 0;
+
+  // Set up the album art.
+  updateCanvas(allData[index]);
+  updateFaveButton();
 }
 
 function updateFaveButton() {
   if (!HAS_LOCAL_STORAGE) return;
   const btn = document.getElementById('btnFave');
-  const favesString =  window.localStorage.getItem('faves') || '[]';
-  const faves = JSON.parse(favesString);
+  const faves = getFromLocalStorage(STORAGE_KEYS.FAVES);
 
+  const index = faves.findIndex(x => x.name === allData[currentSongIndex].fileName);
   // Is the current song a favourite song?
-  if (faves.indexOf(allData[currentSongIndex].fileName) !== -1) {
+  if (index !== -1) {
     btn.classList.add('active');
   } else {
     btn.classList.remove('active');
@@ -230,30 +251,39 @@ function getRandomMidiFilename() {
   return `${FILE_PREFIX}${index}.mid`;
 }
 
-function addSongToPlaylist(song) {
+function addSongToPlaylist(index) {
   if (!HAS_LOCAL_STORAGE) return;
-  const favesString =  window.localStorage.getItem('faves') || '[]';
-  const faves = JSON.parse(favesString);
-  faves.push(song);
-  window.localStorage.setItem('faves', JSON.stringify(faves));
+  const faves = getFromLocalStorage(STORAGE_KEYS.FAVES);
+  const song = allData[currentSongIndex]
+  faves.push({
+    name: song.fileName,
+    totalTime: formatSeconds(song.sequence.totalTime)
+  });
+  saveToLocalStorage(STORAGE_KEYS.FAVES, faves);
   refreshPlayListIfVisible();
 }
 
-function removeSongFromPlaylist(song) {
+function removeSongFromPlaylist(index) {
   if (!HAS_LOCAL_STORAGE) return;
-  const favesString =  window.localStorage.getItem('faves') || '[]';
-  const faves = JSON.parse(favesString);
-  const index = faves.indexOf(song);
+  const faves = getFromLocalStorage(STORAGE_KEYS.FAVES);
   faves.splice(index, 1);
-  window.localStorage.setItem('faves', JSON.stringify(faves));
+  saveToLocalStorage(STORAGE_KEYS.FAVES, faves);
   refreshPlayListIfVisible();
+}
+
+function getFromLocalStorage(key) {
+  return JSON.parse(window.localStorage.getItem(key) || '[]');
+}
+
+function saveToLocalStorage(key, value) {
+  window.localStorage.setItem(key, JSON.stringify(value));
 }
 
 // From https://stackoverflow.com/questions/3733227/javascript-seconds-to-minutes-and-seconds.
 function formatSeconds(s) {
+  s = Math.round(s);
   return(s-(s%=60))/60+(9<s?':':':0')+s;
 }
-
 /*
  * Album art
  */
