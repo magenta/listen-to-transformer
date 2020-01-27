@@ -25,7 +25,7 @@ function init() {
       progressBar.value = note.startTime;
       currentTime.textContent = formatSeconds(Math.round(note.startTime));
     },
-    stop: nextSong
+    stop: () => {}
   }
 
   const hash = window.location.hash.substr(1).trim();
