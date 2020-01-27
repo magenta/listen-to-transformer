@@ -53,6 +53,16 @@ h1 {
   border-radius: var(--spacing);
   box-shadow: 0 30px 56px 6px rgba(0, 0, 0, 0.1);
 }
+.box::before {
+  display: block;
+  content: 'transformer.fm';
+  font-size: 40px;
+  font-weight: light;
+  letter-spacing: 2px;
+  position: absolute;
+  top: -80px;
+  right: 0px;
+}
 
 /*
  * Album art.
@@ -230,7 +240,10 @@ button.active > svg.no {
   .box {
     flex-direction: column;
     height: 300px;
-    margin-top: 150px;
+    margin-top: 200px;
+  }
+  .box::before {
+    top: -140px;
   }
   canvas {
     width: 200px !important;

@@ -1,4 +1,5 @@
-const FILE_PREFIX = './midi/';
+const FILE_PREFIX = 'https://magentadata.storage.googleapis.com/piano_transformer_midi/';
+
 const player = new core.SoundFontPlayer('https://storage.googleapis.com/download.magenta.tensorflow.org/soundfonts_js/salamander');
 const allData = [];  // [ {path, fileName, sequence} ]
 let currentSongIndex;
@@ -13,11 +14,9 @@ function init() {
   document.getElementById('btnPlay').addEventListener('click', playOrPause);
   document.getElementById('btnSave').addEventListener('click', saveSong);
   document.getElementById('btnFave').addEventListener('click', faveOrUnfaveSong);
-  document.getElementById('btnPlayForever').addEventListener('click', playForever);
   document.getElementById('btnPlaylist').addEventListener('click', togglePlaylist);
   document.getElementById('btnNext').addEventListener('click', () => nextSong());
   document.getElementById('btnPrevious').addEventListener('click', () => previousSong());
-
 
   const progressBar = document.querySelector('progress');
   const currentTime = document.querySelector('.current-time');
@@ -65,7 +64,7 @@ function setCurrentSong(index, startPlaying = false) {
   // Get ready for playing, and start playing if we need to.
   player.loadSamples(sequence).then(() => {
     if (startPlaying) {
-      player.start(sequence);
+      startPlayer();
     }
   });
 
@@ -81,14 +80,7 @@ function playOrPause(event) {
   if (player.isPlaying()) {
     stopPlayer();
   } else {
-    event.target.classList.toggle('active');
-    document.querySelector('.album').classList.add('rotating');
-    player.start(allData[currentSongIndex].sequence).then(() => {
-      // If this song is over, go to the next one.
-      if (document.getElementById('btnPlayForever').classList.contains('active')) {
-        nextSong(true);
-      }
-    });
+    startPlayer();
   }
 }
 
@@ -107,10 +99,6 @@ function faveOrUnfaveSong(event) {
   if (document.querySelector('.playlist').classList.contains('showing')) {
     refreshPlayListIfVisible();
   }
-}
-
-function playForever(event) {
-  event.target.classList.toggle('active');
 }
 
 function togglePlaylist(event) {
@@ -158,20 +146,29 @@ function stopPlayer() {
   document.querySelector('.current-time').textContent = '0:00';
   document.querySelector('progress').value = 0;
 }
+function startPlayer() {
+  document.getElementById('btnPlay').classList.add('active');
+  document.querySelector('.album').classList.add('rotating');
+  player.start(allData[currentSongIndex].sequence).then(nextSong);
+}
 
-function nextSong(startPlaying = false) {
+function nextSong() {
+  const isCurrentlyPlaying =
+      document.getElementById('btnPlay').classList.contains('active');
   stopPlayer();
-  getSong().then(() => setCurrentSong(currentSongIndex + 1, startPlaying));
+  getSong().then(() => setCurrentSong(currentSongIndex + 1, isCurrentlyPlaying));
 }
 
 function previousSong() {
+  const isCurrentlyPlaying =
+      document.getElementById('btnPlay').classList.contains('active');
   stopPlayer();
 
   // Loop around if we're at the beginning of the list.
   if (currentSongIndex === 1) {
-    setCurrentSong(allData.length - 2);
+    setCurrentSong(allData.length - 2, isCurrentlyPlaying);
   } else {
-    setCurrentSong(currentSongIndex - 1);
+    setCurrentSong(currentSongIndex - 1, isCurrentlyPlaying);
   }
 }
 
@@ -194,9 +191,9 @@ function updateCanvas(songData) {
 }
 
 function getRandomMidiFilename() {
-  const tempFiles = [7425, 7426, 74110, 74252, 74257, 37758];
-  const index = Math.floor(Math.random() * tempFiles.length);
-  return `${FILE_PREFIX}${tempFiles[index]}.mid`;
+  const numFiles = 99975;
+  const index = Math.floor(Math.random() * numFiles);
+  return `${FILE_PREFIX}${index}.mid`;
 }
 
 function addSongToPlaylist(song) {
