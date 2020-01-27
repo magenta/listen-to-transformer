@@ -12,7 +12,6 @@ setTimeout(init, 100);
 function init() {
   // Event listeners.
   document.getElementById('btnPlay').addEventListener('click', playOrPause);
-  document.getElementById('btnSave').addEventListener('click', saveSong);
   document.getElementById('btnFave').addEventListener('click', faveOrUnfaveSong);
   document.getElementById('btnPlaylist').addEventListener('click', togglePlaylist);
   document.getElementById('btnNext').addEventListener('click', () => nextSong());
@@ -25,7 +24,7 @@ function init() {
       progressBar.value = note.startTime;
       currentTime.textContent = formatSeconds(Math.round(note.startTime));
     },
-    stop: () => {}
+    stop: nextSong
   }
   // Get the first 3 songs and update the view when ready.
   Promise.all([getSong(), getSong()])
@@ -76,15 +75,14 @@ function setCurrentSong(index, startPlaying = false) {
 /*
  * Event listeners.
  */
-function playOrPause(event) {
-  if (player.isPlaying()) {
-    stopPlayer();
+function playOrPause() {
+  const state = player.getPlayState();
+  if (state === 'started') {
+    pausePlayer();
   } else {
     startPlayer();
   }
 }
-
-function saveSong(event) {}
 
 function faveOrUnfaveSong(event) {
   const btn = event.target;
@@ -139,36 +137,43 @@ function refreshPlayListIfVisible() {
 /*
  * Helpers.
  */
-function stopPlayer() {
-  player.stop();
+function pausePlayer(andStop = false) {
+  if (andStop) {
+    player.stop();
+    document.querySelector('.current-time').textContent = '0:00';
+    document.querySelector('progress').value = 0;
+  } else {
+    player.pause();
+  }
   document.getElementById('btnPlay').classList.remove('active');
   document.querySelector('.album').classList.remove('rotating');
-  document.querySelector('.current-time').textContent = '0:00';
-  document.querySelector('progress').value = 0;
-}
-function startPlayer() {
-  document.getElementById('btnPlay').classList.add('active');
-  document.querySelector('.album').classList.add('rotating');
-  player.start(allData[currentSongIndex].sequence).then(nextSong);
 }
 
+function startPlayer() {
+  const state = player.getPlayState();
+  if (state === 'stopped') {
+    player.start(allData[currentSongIndex].sequence).then(nextSong);
+  } else {
+    player.resume();
+  }
+  document.getElementById('btnPlay').classList.add('active');
+  document.querySelector('.album').classList.add('rotating');
+}
+
+// Next/previous should also start the song.
 function nextSong() {
-  const isCurrentlyPlaying =
-      document.getElementById('btnPlay').classList.contains('active');
-  stopPlayer();
-  getSong().then(() => setCurrentSong(currentSongIndex + 1, isCurrentlyPlaying));
+  pausePlayer(true);
+  getSong().then(() => setCurrentSong(currentSongIndex + 1, true));
 }
 
 function previousSong() {
-  const isCurrentlyPlaying =
-      document.getElementById('btnPlay').classList.contains('active');
-  stopPlayer();
+  pausePlayer(true);
 
   // Loop around if we're at the beginning of the list.
   if (currentSongIndex === 1) {
-    setCurrentSong(allData.length - 2, isCurrentlyPlaying);
+    setCurrentSong(allData.length - 2, true);
   } else {
-    setCurrentSong(currentSongIndex - 1, isCurrentlyPlaying);
+    setCurrentSong(currentSongIndex - 1, true);
   }
 }
 
