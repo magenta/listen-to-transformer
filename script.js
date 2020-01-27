@@ -27,11 +27,21 @@ function init() {
     },
     stop: nextSong
   }
-  // Get the first 3 songs and update the view when ready.
-  Promise.all([getSong(), getSong()])
+
+  const hash = window.location.hash.substr(1).trim();
+  const initialMidi = hash !== '' ? `${FILE_PREFIX}${hash}` : undefined;
+
+  // Get a current song and a previous song so that we can click previous, i guess.
+  Promise.all([getSong(), getSong(initialMidi)])
   .then(() => {
     setCurrentSong(1);
   });
+
+  // If we don't have local storage, we don't have playlists.
+  if (!HAS_LOCAL_STORAGE) {
+    document.getElementById('btnFave').hidden = true;
+    document.getElementById('btnPlaylist').hidden = true;
+  }
 }
 
 async function getSong(path) {
@@ -50,6 +60,8 @@ async function getSong(path) {
 
 function setCurrentSong(index, startPlaying = false) {
   currentSongIndex = index;
+  window.location.hash = allData[index].fileName;
+
   const sequence = allData[index].sequence;
 
   // Set up the progress bar.
@@ -101,6 +113,10 @@ function faveOrUnfaveSong(event) {
 }
 
 function togglePlaylist(event) {
+    // If an existing popup is open, close it.
+  document.querySelector('.help').classList.remove('showing');
+  document.querySelector('#btnHelp').classList.remove('active');
+
   event.target.classList.toggle('active');
   const el = document.querySelector('.playlist');
   el.classList.toggle('showing');
@@ -108,13 +124,18 @@ function togglePlaylist(event) {
 }
 
 function toggleHelp(event) {
+  // If an existing popup is open, close it.
+  document.querySelector('.playlist').classList.remove('showing');
+  document.querySelector('#btnPlaylist').classList.remove('active');
+
   event.target.classList.toggle('active');
   const el = document.querySelector('.help');
   el.classList.toggle('showing');
 }
 
 function refreshPlayListIfVisible() {
-  if (!document.querySelector('.playlist').classList.contains('showing')) {
+  if (!HAS_LOCAL_STORAGE ||
+    !document.querySelector('.playlist').classList.contains('showing')) {
     return;
   }
 
@@ -185,6 +206,7 @@ function previousSong() {
 }
 
 function updateFaveButton() {
+  if (!HAS_LOCAL_STORAGE) return;
   const btn = document.getElementById('btnFave');
   const favesString =  window.localStorage.getItem('faves') || '[]';
   const faves = JSON.parse(favesString);
@@ -209,6 +231,7 @@ function getRandomMidiFilename() {
 }
 
 function addSongToPlaylist(song) {
+  if (!HAS_LOCAL_STORAGE) return;
   const favesString =  window.localStorage.getItem('faves') || '[]';
   const faves = JSON.parse(favesString);
   faves.push(song);
@@ -217,6 +240,7 @@ function addSongToPlaylist(song) {
 }
 
 function removeSongFromPlaylist(song) {
+  if (!HAS_LOCAL_STORAGE) return;
   const favesString =  window.localStorage.getItem('faves') || '[]';
   const faves = JSON.parse(favesString);
   const index = faves.indexOf(song);
