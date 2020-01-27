@@ -44,13 +44,32 @@
             <button alt="view playlist" id="btnPlaylist">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M15 6H3v2h12V6zm0 4H3v2h12v-2zM3 16h8v-2H3v2zM17 6v8.18c-.31-.11-.65-.18-1-.18-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3V8h3V6h-5z"/></svg>
             </button>
-            <button alt="show help" disabled id="btnHelp">
+            <button alt="show help" id="btnHelp">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>
             </button>
           </div> <!-- controls -->
         </div>  <!-- vertical -->
-        <div class="vertical playlist">
-          <ul></ul>
+        <div class="vertical popup playlist">
+          <div class="content"><ul></ul></div>
+        </div>
+        <div class="vertical popup help">
+          <div class="content">
+            <p>
+              <a href="https://magenta.tensorflow.org/piano-transformer">Piano Transformer</a> was trained in
+              TensorFlow on MIDI from publicly available YouTube piano recordings,
+              transcribed using <a href="https://magenta.tensorflow.org/onsets-frames">Onsets and Frames</a>.
+              Piano samples are from <a href="https://archive.org/details/SalamanderGrandPianoV3">Salamander Grand Piano</a>.
+            </p>
+            <h4>Still todo:</h4>
+            <ul>
+              <li>hotlinking of songs</li>
+              <li>share playlist</li>
+              <li>save the song times to the playlist</li>
+              <li>make this help dialog useful</li>
+            </ul>
+          </div>
+        </div>
+
         </div>
       </div>  <!-- box -->
     </div>

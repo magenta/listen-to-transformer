@@ -14,6 +14,7 @@ function init() {
   document.getElementById('btnPlay').addEventListener('click', playOrPause);
   document.getElementById('btnFave').addEventListener('click', faveOrUnfaveSong);
   document.getElementById('btnPlaylist').addEventListener('click', togglePlaylist);
+  document.getElementById('btnHelp').addEventListener('click', toggleHelp);
   document.getElementById('btnNext').addEventListener('click', () => nextSong());
   document.getElementById('btnPrevious').addEventListener('click', () => previousSong());
 
@@ -104,6 +105,12 @@ function togglePlaylist(event) {
   const el = document.querySelector('.playlist');
   el.classList.toggle('showing');
   refreshPlayListIfVisible();
+}
+
+function toggleHelp(event) {
+  event.target.classList.toggle('active');
+  const el = document.querySelector('.help');
+  el.classList.toggle('showing');
 }
 
 function refreshPlayListIfVisible() {

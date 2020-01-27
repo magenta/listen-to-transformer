@@ -30,6 +30,14 @@ h1 {
   font-size: 60px;
   letter-spacing: 4px;
 }
+a:link, a:visited {
+  color: inherit;
+  font-weight: bold;
+  transition: color 0.2s ease-in-out;
+}
+a:hover {
+  color: var(--primary_light);
+}
 .vertical {
   display: flex;
   flex-direction: column;
@@ -161,14 +169,15 @@ button.active > svg.no {
 }
 #btnPlayForever.active,
 #btnFave.active,
-#btnPlaylist.active {
+#btnPlaylist.active,
+#btnHelp.active {
   color: var(--tertiary_light);
 }
 
 /*
  * Playlist.
  */
-.playlist {
+.popup {
   position: absolute;
   background: white;
   border-radius: var(--spacing);
@@ -180,20 +189,22 @@ button.active > svg.no {
   visibility: hidden;
   transition: height 0.2s ease-in-out, visibility 0.2s ease-in-out;
 }
-.playlist.showing {
+.popup.showing {
   height: 300px;
   visibility: visible;
   transition: height 0.2s ease-in-out, visibility 0.2s ease-in-out;
   overflow: auto;
 }
-.playlist ul {
+.popup .content {
   display: none;
+}
+.popup.showing .content {
+  display: block;
+}
+.playlist ul {
   margin: 0;
   padding: 0;
   list-style-type: none;
-}
-.playlist.showing ul {
-  display: block;
 }
 .playlist ul li {
   padding: var(--spacing) var(--spacing-m);
@@ -257,7 +268,7 @@ button.active > svg.no {
   .controls {
     width: 70vw;
   }
-  .playlist.showing {
+  .popup.showing {
     left: 0;
     top: calc(300px - 20px);
   }
