@@ -73,7 +73,6 @@ section {
   left: 0;
   height: 100vh;
   width: 100vw;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -251,7 +250,7 @@ button.active {
   right: 0;
   top: calc(var(--box-height) - 20px);  /* this is the same as the height set in .box and spacing*/
   left: 300px; /* width of canvas + a bit */
-  padding: var(--spacing-m);
+  padding: var(--spacing-s) var(--spacing-m);
   visibility: hidden;
   transition: height 0.2s ease-in-out, visibility 0.2s ease-in-out;
   z-index: -10;
