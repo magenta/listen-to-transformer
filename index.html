@@ -18,9 +18,26 @@ limitations under the License.
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.min.js"></script>
   </head>
   <body>
-    <div class="vertical">
+    <section class="splash">
+      <div class="vertical box long">
+        <div class="content">
+          <h1>transformer.fm</h1>
+
+          <p>TODO: write more words here</p>
+          <p>
+            <a href="https://magenta.tensorflow.org/piano-transformer">Piano Transformer</a> was trained in
+            TensorFlow on MIDI from publicly available YouTube piano recordings,
+            transcribed using <a href="https://magenta.tensorflow.org/onsets-frames">Onsets and Frames</a>.
+            Piano samples are from <a href="https://archive.org/details/SalamanderGrandPianoV3">Salamander Grand Piano</a>.
+          </p>
+          <button class="square" id="btnCloseHelp">got it!</button>
+        </div>
+      </div><!-- /help -->
+    </section>
+
+    <section class="main" hidden>
       <div class="box horizontal">
-        <h1>
+        <h1 class="outside">
           <span>transformer.fm</span>
           <button title="about this" id="btnHelp">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>
@@ -28,15 +45,13 @@ limitations under the License.
         </h1>
 
         <div class="album canvas-container"></div>
-        <div class="vertical">
+        <div class="vertical" style="width:100%">
           <div class="horizontal">
             <div class="song-title">&nbsp;</div>
-            <button title="download this song" id="btnSave">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2z"/></svg>
-            </button>
-            <button title="favorite this song" id="btnFave">
-              <svg class="no" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"/></svg>
-              <svg class="yes" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+
+            <button title="share this song" id="btnShare">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+              share
             </button>
           </div>
 
@@ -59,26 +74,39 @@ limitations under the License.
             <button title="go to the next song" id="btnNext">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
             </button>
+            <button title="favorite this song" id="btnFave">
+              <svg class="no" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"/></svg>
+              <svg class="yes" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </button>
             <button title="view your saved songs" id="btnPlaylist">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M15 6H3v2h12V6zm0 4H3v2h12v-2zM3 16h8v-2H3v2zM17 6v8.18c-.31-.11-.65-.18-1-.18-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3V8h3V6h-5z"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M4 10h12v2H4zm0-4h12v2H4zm0 8h8v2H4zm10 0v6l5-3z"/></svg>
             </button>
           </div> <!-- /controls -->
         </div>  <!-- /vertical -->
         <div class="vertical popup playlist">
           <div class="content"><ul></ul></div>
         </div>  <!-- /playlist -->
-        <div class="vertical popup help">
+        <div class="vertical popup share">
           <div class="content">
-            <p>
-              <a href="https://magenta.tensorflow.org/piano-transformer">Piano Transformer</a> was trained in
-              TensorFlow on MIDI from publicly available YouTube piano recordings,
-              transcribed using <a href="https://magenta.tensorflow.org/onsets-frames">Onsets and Frames</a>.
-              Piano samples are from <a href="https://archive.org/details/SalamanderGrandPianoV3">Salamander Grand Piano</a>.
-            </p>
+            <a class="button" target="_blank" href="https://twitter.com/intent/tweet?hashtags=madewithmagenta&text=Listen%20to%20this%20melody%20from%20the%20Music%20Transformer%20radio!%20">
+              <svg class="twitter" xmlns="http://www.w3.org/2000/svg" id="Logo_FIXED" data-name="Logo — FIXED" viewBox="0 0 400 400"><defs><style>.cls-1{fill:none;}.cls-2{fill:currentColor;}</style></defs><title>Twitter_Logo_Blue</title><rect class="cls-1" width="400" height="400"/><path class="cls-2" d="M153.62,301.59c94.34,0,145.94-78.16,145.94-145.94,0-2.22,0-4.43-.15-6.63A104.36,104.36,0,0,0,325,122.47a102.38,102.38,0,0,1-29.46,8.07,51.47,51.47,0,0,0,22.55-28.37,102.79,102.79,0,0,1-32.57,12.45,51.34,51.34,0,0,0-87.41,46.78A145.62,145.62,0,0,1,92.4,107.81a51.33,51.33,0,0,0,15.88,68.47A50.91,50.91,0,0,1,85,169.86c0,.21,0,.43,0,.65a51.31,51.31,0,0,0,41.15,50.28,51.21,51.21,0,0,1-23.16.88,51.35,51.35,0,0,0,47.92,35.62,102.92,102.92,0,0,1-63.7,22A104.41,104.41,0,0,1,75,278.55a145.21,145.21,0,0,0,78.62,23"/></svg>
+              Share on Twitter
+            </a>
+            <a class="button" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fg.co%2Fmagenta%2Ftransformer-radio%2F&amp;src=sdkpreparse">
+              <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_1" viewBox="-40 -40 400 400">
+                <path id="Blue_1_" d="M248.082,262.307c7.854,0,14.223-6.369,14.223-14.225V18.812  c0-7.857-6.368-14.224-14.223-14.224H18.812c-7.857,0-14.224,6.367-14.224,14.224v229.27c0,7.855,6.366,14.225,14.224,14.225  H248.082z"/>
+                <path id="f" fill="#FFFFFF" d="M182.409,262.307v-99.803h33.499l5.016-38.895h-38.515V98.777c0-11.261,3.127-18.935,19.275-18.935  l20.596-0.009V45.045c-3.562-0.474-15.788-1.533-30.012-1.533c-29.695,0-50.025,18.126-50.025,51.413v28.684h-33.585v38.895h33.585  v99.803H182.409z"/>
+              </svg>
+              Share on Facebook
+            </a>
+            <button id="btnSave">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 32 32"><path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2z"/></svg>
+              Download current song as MIDI
+            </button>
           </div>
-        </div><!-- /help -->
+        </div>  <!-- /share -->
       </div>  <!-- box -->
-    </div>
+    </section>
 
     <div class="waves">
       <svg viewbox="0 0 100 20">

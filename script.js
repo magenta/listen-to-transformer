@@ -37,6 +37,9 @@ function init() {
   document.getElementById('btnPlaylist').addEventListener('click', togglePlaylist);
   document.getElementById('btnSave').addEventListener('click', save);
   document.getElementById('btnHelp').addEventListener('click', toggleHelp);
+  document.getElementById('btnCloseHelp').addEventListener('click', toggleHelp);
+  document.getElementById('btnShare').addEventListener('click', toggleShare);
+
   document.getElementById('btnNext').addEventListener('click', () => nextSong());
   document.getElementById('btnPrevious').addEventListener('click', () => previousSong());
 
@@ -110,9 +113,9 @@ function save() {
 }
 
 function togglePlaylist(event) {
-    // If an existing popup is open, close it.
-  document.querySelector('.help').classList.remove('showing');
-  document.querySelector('#btnHelp').classList.remove('active');
+  // If the share dialog is open, close it.
+  document.querySelector('.share').classList.remove('showing');
+  document.querySelector('#btnShare').classList.remove('active');
 
   event.target.classList.toggle('active');
   const el = document.querySelector('.playlist');
@@ -120,14 +123,19 @@ function togglePlaylist(event) {
   refreshPlayListIfVisible();
 }
 
-function toggleHelp(event) {
-  // If an existing popup is open, close it.
+function toggleShare(event) {
+  // If the playlist is open, close it.
   document.querySelector('.playlist').classList.remove('showing');
   document.querySelector('#btnPlaylist').classList.remove('active');
 
   event.target.classList.toggle('active');
-  const el = document.querySelector('.help');
-  el.classList.toggle('showing');
+  document.querySelector('.share').classList.toggle('showing');
+}
+
+function toggleHelp() {
+  const el = document.querySelector('.splash');
+  document.querySelector('.main').hidden = el.hidden;
+  el.hidden = !el.hidden;
 }
 
 /*

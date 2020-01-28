@@ -28,6 +28,7 @@ body {
   --spacing-s: 8px;
   --spacing: 14px;
   --spacing-m: 28px;
+  --box-height: 200px;
 
   width: 100vw;
   height: 100vh;
@@ -47,15 +48,16 @@ h1 {
   font-size: 40px;
   font-weight: lighter;
   letter-spacing: 2px;
-  position: absolute;
-  top: -140px;
-  right: 0;
 }
 h1 > span, h1 > button {
   display: inline-block;
   vertical-align: middle;
 }
-
+h1.outside {
+  position: absolute;
+  top: -140px;
+  right: 0;
+}
 a:link, a:visited {
   color: inherit;
   font-weight: bold;
@@ -63,6 +65,21 @@ a:link, a:visited {
 }
 a:hover {
   color: var(--primary_light);
+}
+
+section {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+section.splash {
+  align-items: center;
 }
 .vertical {
   display: flex;
@@ -81,19 +98,28 @@ a:hover {
   position: relative;
   background: white;
   padding: var(--spacing) var(--spacing-m);
+  width: 90vw;
+  max-width: 720px;
   margin: 200px auto;
   margin-bottom: 0;
-  height: 200px;
+  height: var(--box-height);
   border-radius: var(--spacing);
   box-shadow: 0 30px 56px 6px rgba(0, 0, 0, 0.1);
 }
 
+.box.long {
+  padding: var(--spacing-m);
+  height: 100%;
+  margin: 100px;
+  background: transparent;
+  box-shadow: none;
+}
 /*
  * Album art.
  */
 .album {
   position: relative;
-  margin-right: var(--spacing-m);
+  margin-right: var(--spacing-s);
 }
 .album.rotating {
   animation: rotate infinite 15s linear;
@@ -150,10 +176,9 @@ progress::-webkit-progress-value {
  */
 .controls {
   position: relative;
-  width: 400px;
-  margin: var(--spacing-m) 0;
 }
-button {
+
+button, .button {
   display:block;
   color: var(--primary_dark);
   background: transparent;
@@ -163,19 +188,43 @@ button {
   transition: color 0.2s ease-in-out, transform 0.2s ease-in-out;
   margin: 0;
   padding: 0;
-  font-weight: bold;
+  font-weight: normal;
   font-family: inherit;
   font-size: inherit;
 }
+a.button:link, a.button:visited {
+  font-weight: normal;
+  text-decoration: none;
+}
+button:not(:first-of-type):not(:last-of-type) {
+  padding: var(--spacing);
+}
+button.square {
+  border: 2px solid black;
+  border-radius: 3px;
+  padding: var(--spacing-s);
+  background: transparent;
+  color: var(--primary_dark);
+  min-width: 100px;
+  transition: background 0.2s linear;
+  margin: var(--spacing-m) auto;
+}
+button.square:hover {
+  background: var(--primary_light);
+  border-color: var(--primary_light);
+  color: var(--primary_dark);
+}
+
 button:hover {
   color: var(--primary_light);
 }
-button svg {
+button svg, .button svg {
   pointer-events: none;
   fill: currentColor;
   width: 40px;
   height: 40px;
   margin: 0 auto;
+  vertical-align: middle;
 }
 button.active > svg.yes,
 button:not(.active) > svg.no {
@@ -185,11 +234,13 @@ button:not(.active) > svg.yes,
 button.active > svg.no {
   display: none;
 }
-#btnPlayForever.active,
-#btnFave.active,
-#btnPlaylist.active,
-#btnHelp.active {
+button.active {
   color: var(--tertiary_light);
+}
+
+#btnShare svg {
+  height: 24px;
+  width: 24px;
 }
 
 /*
@@ -201,7 +252,7 @@ button.active > svg.no {
   border-radius: var(--spacing);
   height: 0;
   right: 0;
-  top: calc(200px - 20px);  /* this is the same as the height set in .box and spacing*/
+  top: calc(var(--box-height) - 20px);  /* this is the same as the height set in .box and spacing*/
   left: 300px; /* width of canvas + a bit */
   padding: var(--spacing-m);
   visibility: hidden;
@@ -215,18 +266,21 @@ button.active > svg.no {
   transition: height 0.2s ease-in-out, visibility 0.2s ease-in-out;
   overflow: auto;
 }
+.popup.share.showing {
+  height: 180px;
+}
 .popup .content {
   display: none;
 }
 .popup.showing .content {
   display: block;
 }
-.playlist ul {
+.popup ul {
   margin: 0;
   padding: 0;
   list-style-type: none;
 }
-.playlist ul li {
+.popup ul li {
   padding: var(--spacing-s);
   cursor: pointer;
   display: flex;
@@ -235,21 +289,21 @@ button.active > svg.no {
   align-items: center;
   border-bottom: 1px solid var(--background);
 }
-.playlist ul li.list-header {
+.popup ul li.list-header {
   text-transform: uppercase;
   font-size: 12px;
 }
-.playlist ul li svg {
+.popup ul li svg {
   width: 24px;
   height: 24px;
 }
-.playlist ul li:not(.list-header):hover {
+.popup ul li:not(.list-header):hover {
   background: var(--background);
 }
-.playlist ul li > div:first-of-type {
+.popup ul li > div:first-of-type {
   flex: 3;
 }
-.playlist ul li > div:not(:first-of-type) {
+.popup ul li > div:not(:first-of-type) {
   flex: 1;
 }
 
@@ -279,18 +333,22 @@ button.active > svg.no {
  * Small screens.
  */
 @media only screen and (max-width: 800px)  {
-  .controls {
-    width: 300px;
+  .controls button {
+    padding: var(--spacing-s);
   }
 }
 @media only screen and (max-width: 700px)  {
+  body {
+    --box-height: 260px;
+  }
   .box {
     flex-direction: column;
-    height: 300px;
     margin-top: 200px;
   }
   h1 {
     font-size: 5vw;
+  }
+  h1.outside {
     right: auto;
     top: -180px;
   }
@@ -306,31 +364,19 @@ button.active > svg.no {
     margin-top: -100px;
     margin-right: 0;
   }
-  .controls {
-    width: 70vw;
-  }
-  .popup {
+  .playlist {
     left: 0;
     right: 0;
   }
-  .popup.showing {
+  .playlist.showing {
     height: 30vh;
     left: 0;
-    top: calc(300px - 20px);
-  }
-  .song-title {
-    text-align: center;
   }
   .waves {
     transform: scaleY(4);
   }
 }
-@media only screen and (max-height: 670px)  {
-  .popup.showing {
-    height: 50vh;
-    top: -100px;
-  }
-}
+
 @media only screen and (max-width: 500px)  {
   h1 {
     font-size: 7vw;
