@@ -78,9 +78,6 @@ section {
   flex-direction: column;
   justify-content: flex-start;
 }
-section.splash {
-  align-items: center;
-}
 .vertical {
   display: flex;
   flex-direction: column;
@@ -110,9 +107,9 @@ section.splash {
 .box.long {
   padding: var(--spacing-m);
   height: 100%;
-  margin: 100px;
   background: transparent;
   box-shadow: none;
+  margin-top: 100px;
 }
 /*
  * Album art.
@@ -344,6 +341,9 @@ button.active {
   .box {
     flex-direction: column;
     margin-top: 200px;
+  }
+  .box.long {
+    width: 100%;
   }
   h1 {
     font-size: 5vw;
