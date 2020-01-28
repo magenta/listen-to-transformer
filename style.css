@@ -172,6 +172,7 @@ progress::-webkit-progress-value {
  */
 .controls {
   position: relative;
+  width: 100%;
 }
 
 button, .button {
@@ -191,9 +192,6 @@ button, .button {
 a.button:link, a.button:visited {
   font-weight: normal;
   text-decoration: none;
-}
-button:not(:first-of-type):not(:last-of-type) {
-  padding: var(--spacing);
 }
 button.square {
   border: 2px solid black;
@@ -328,11 +326,6 @@ button.active {
 /*
  * Small screens.
  */
-@media only screen and (max-width: 800px)  {
-  .controls button {
-    padding: var(--spacing-s);
-  }
-}
 @media only screen and (max-width: 700px)  {
   body {
     --box-height: 260px;
