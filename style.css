@@ -363,11 +363,11 @@ button.active {
     margin-top: -100px;
     margin-right: 0;
   }
-  .playlist {
+  .popup {
     left: 0;
     right: 0;
   }
-  .playlist.showing {
+  .popup.showing {
     height: 30vh;
     left: 0;
   }
