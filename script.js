@@ -18,6 +18,9 @@
  const FILE_PREFIX = 'https://magentadata.storage.googleapis.com/piano_transformer_midi/';
 // Update this if the format we store the data into local storage has changed.
 const STORAGE_VERSION = '0.0.1';
+// Update this if the MIDI files have changed (because they were generated with a new model, etc.)
+const MODEL_VERSION = '1.0';
+
 const STORAGE_KEYS = {FAVES: 'faves', VERSION: 'data_version'};
 const EVENTS = {START: 'start', NEXT: 'next', PREVIOUS: 'previous', FAVE: 'fave', UNFAVE: 'unfave',SAVE:'save'};
 
@@ -339,15 +342,7 @@ function tagClick(eventName, logPlayTime, filename) {
   filename = filename || allData[currentSongIndex].fileName;
 
   const details = {};
-  let category;
-  if (eventName === 'save') {
-    category = 'storage';
-  } else if (eventName === 'fave' || eventName === 'unfave') {
-    category = 'preference';
-  } else {
-    category = 'navigation';
-  }
-  details['event_category'] = category;
+  details['event_category'] = MODEL_VERSION;
   details['event_label'] = filename;
 
   if (logPlayTime) {
