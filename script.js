@@ -235,8 +235,8 @@ function updateFaveButton() {
   if (!HAS_LOCAL_STORAGE) return;
   const btn = document.getElementById('btnFave');
   const faves = getFromLocalStorage(STORAGE_KEYS.FAVES);
-
   const index = faves.findIndex(x => x.name === allData[currentSongIndex].fileName);
+
   // Is the current song a favourite song?
   if (index !== -1) {
     btn.classList.add('active');
@@ -296,7 +296,7 @@ function refreshPlayListIfVisible() {
 function addSongToPlaylist() {
   if (!HAS_LOCAL_STORAGE) return;
   const faves = getFromLocalStorage(STORAGE_KEYS.FAVES);
-  const song = allData[currentSongIndex]
+  const song = allData[currentSongIndex];
   faves.push({
     name: song.fileName,
     totalTime: formatSeconds(song.sequence.totalTime)
@@ -307,8 +307,10 @@ function addSongToPlaylist() {
 
 function removeSongFromPlaylist(index) {
   if (!HAS_LOCAL_STORAGE) return;
+  const fileName = allData[currentSongIndex].fileName;
   const faves = getFromLocalStorage(STORAGE_KEYS.FAVES);
-  faves.splice(index, 1);
+  const faveIndex = faves.findIndex(x => x.name === fileName);
+  faves.splice(faveIndex, 1);
   saveToLocalStorage(STORAGE_KEYS.FAVES, faves);
   refreshPlayListIfVisible();
 }
