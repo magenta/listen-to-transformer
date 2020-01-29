@@ -19,6 +19,7 @@
 // Update this if the format we store the data into local storage has changed.
 const STORAGE_VERSION = '0.0.1';
 const STORAGE_KEYS = {FAVES: 'faves', VERSION: 'data_version'};
+const EVENTS = {START: 'start', NEXT: 'next', PREVIOUS: 'previous', FAVE: 'fave', UNFAVE: 'unfave',SAVE:'save'};
 
 const player = new core.SoundFontPlayer('https://storage.googleapis.com/download.magenta.tensorflow.org/soundfonts_js/salamander');
 const allData = [];  // [ {path, fileName, sequence} ]
@@ -40,8 +41,14 @@ function init() {
   document.getElementById('btnCloseHelp').addEventListener('click', toggleHelp);
   document.getElementById('btnShare').addEventListener('click', toggleShare);
 
-  document.getElementById('btnNext').addEventListener('click', () => nextSong());
-  document.getElementById('btnPrevious').addEventListener('click', () => previousSong());
+  document.getElementById('btnNext').addEventListener('click', () => {
+    tagClick(EVENTS.NEXT, true);
+    nextSong()
+  });
+  document.getElementById('btnPrevious').addEventListener('click', () => {
+    tagClick(EVENTS.PREVIOUS, true);
+    previousSong();
+  });
 
   const hash = window.location.hash.substr(1).trim();
   const initialMidi = hash !== '' ? `${FILE_PREFIX}${hash}` : undefined;
@@ -94,8 +101,10 @@ function faveOrUnfaveSong(event) {
   const btn = event.target;
   if (btn.classList.contains('active')) {
     btn.classList.remove('active');
+    tagClick(EVENTS.UNFAVE, true);
     removeSongFromPlaylist(currentSongIndex);
   } else {
+    tagClick(EVENTS.FAVE, true);
     btn.classList.add('active');
     addSongToPlaylist(currentSongIndex);
   }
@@ -106,6 +115,7 @@ function faveOrUnfaveSong(event) {
 }
 
 function save() {
+  tagClick(EVENTS.SAVE);
   const song = allData[currentSongIndex];
   window.saveAs(
     new File([window.core.sequenceProtoToMidi(song.sequence)],
@@ -158,6 +168,7 @@ function pausePlayer(andStop = false) {
 function startPlayer() {
   const state = player.getPlayState();
   if (state === 'stopped') {
+    tagClick(EVENTS.START);
     secondsElapsed = 0;
     player.start(allData[currentSongIndex].sequence).then(nextSong);
   } else {
@@ -188,10 +199,10 @@ function previousSong() {
 }
 
 function changeSong(index, noAutoplay = false) {
-  pausePlayer(true);
-
   // Update to this song.
   currentSongIndex = index;
+
+  pausePlayer(true);
   window.location.hash = allData[index].fileName;
 
   // Get ready for playing, and start playing if we need to.
@@ -263,20 +274,23 @@ function refreshPlayListIfVisible() {
 
     ul.appendChild(li);
     li.onclick = (event) => {
+      const file = event.target.dataset.filename;
+      const index = event.target.dataset.index;
+
       const className = event.target.className;
       if (className === 'remove') {
         document.getElementById('btnFave').classList.remove('active');
-        removeSongFromPlaylist(event.target.dataset.index);
+        removeSongFromPlaylist(index);
+        tagClick(EVENTS.UNFAVE, false, file);
       } else if (className === 'play') {
-
-        getSong(`${FILE_PREFIX}${event.target.dataset.filename}`).then(
+        getSong(`${FILE_PREFIX}${file}`).then(
           () => changeSong(allData.length - 1));
       }
     }
   }
 }
 
-function addSongToPlaylist(index) {
+function addSongToPlaylist() {
   if (!HAS_LOCAL_STORAGE) return;
   const faves = getFromLocalStorage(STORAGE_KEYS.FAVES);
   const song = allData[currentSongIndex]
@@ -319,6 +333,27 @@ function saveToLocalStorage(key, value) {
 function formatSeconds(s) {
   s = Math.round(s);
   return(s-(s%=60))/60+(9<s?':':':0')+s;
+}
+
+function tagClick(eventName, logPlayTime, filename) {
+  filename = filename || allData[currentSongIndex].fileName;
+
+  const details = {};
+  let category;
+  if (eventName === 'save') {
+    category = 'storage';
+  } else if (eventName === 'fave' || eventName === 'unfave') {
+    category = 'preference';
+  } else {
+    category = 'navigation';
+  }
+  details['event_category'] = category;
+  details['event_label'] = filename;
+
+  if (logPlayTime) {
+    details['value'] = progressBar.value;
+  }
+  gtag('event', eventName, details);
 }
 
 /*
