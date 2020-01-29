@@ -362,6 +362,7 @@ button.active {
     right: 0;
   }
   .popup.showing {
+    padding-top: var(--spacing-m);
     height: 30vh;
     left: 0;
   }
