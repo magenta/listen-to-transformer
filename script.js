@@ -60,9 +60,7 @@ function init() {
   const hash = window.location.hash.substr(1).trim();
   const initialMidi = hash !== '' ? `${FILE_PREFIX}${hash}` : undefined;
 
-  // Get a current song and a previous song so that we can click previous, i guess.
-  Promise.all([getSong(), getSong(initialMidi)])
-  .then(() => changeSong(1, true));
+  getSong(initialMidi).then(() => changeSong(0, true));
 
   // If we don't have local storage, we don't have playlists.
   if (!HAS_LOCAL_STORAGE) {
@@ -168,6 +166,7 @@ function pausePlayer(andStop = false) {
     player.pause();
   }
   clearInterval(progressInterval);
+  progressInterval = null;
   document.getElementById('btnPlay').classList.remove('active');
   document.querySelector('.album').classList.remove('rotating');
 }
@@ -204,14 +203,19 @@ function nextSong() {
 }
 
 function previousSong() {
-  // Loop around if we're at the beginning of the list.
-  const index = currentSongIndex === 0 ? allData.length - 1 : currentSongIndex - 1;
-  changeSong(index);
+  changeSong(currentSongIndex - 1);
 }
 
 function changeSong(index, noAutoplay = false) {
   // Update to this song.
   currentSongIndex = index;
+
+  // If this is the first song, we don't get a previous button.
+  if (currentSongIndex === 0) {
+    document.getElementById('btnPrevious').setAttribute('disabled', true);
+  } else {
+    document.getElementById('btnPrevious').removeAttribute('disabled');
+  }
 
   pausePlayer(true);
   window.location.hash = allData[index].fileName;
