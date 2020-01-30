@@ -22,7 +22,11 @@ const STORAGE_VERSION = '0.0.1';
 const MODEL_VERSION = '1.0';
 
 const STORAGE_KEYS = {FAVES: 'faves', VERSION: 'data_version'};
-const EVENTS = {START: 'start', NEXT: 'next', PREVIOUS: 'previous', FAVE: 'fave', UNFAVE: 'unfave',SAVE:'save'};
+const EVENTS = {
+  START: 'start', COMPLETE: 'complete',
+  NEXT: 'next', PREVIOUS: 'previous',
+  FAVE: 'fave', UNFAVE: 'unfave',
+  SAVE:'save'};
 
 const player = new core.SoundFontPlayer('https://storage.googleapis.com/download.magenta.tensorflow.org/soundfonts_js/salamander');
 const allData = [];  // [ {path, fileName, sequence} ]
@@ -173,7 +177,11 @@ function startPlayer() {
   if (state === 'stopped') {
     tagClick(EVENTS.START);
     secondsElapsed = 0;
-    player.start(allData[currentSongIndex].sequence).then(nextSong);
+    player.start(allData[currentSongIndex].sequence).then(
+      () => {
+        tagClick(EVENTS.COMPLETE);
+        nextSong();
+      });
   } else {
     player.resume();
   }
@@ -197,7 +205,7 @@ function nextSong() {
 
 function previousSong() {
   // Loop around if we're at the beginning of the list.
-  const index = currentSongIndex === 1 ? allData.length - 2 : currentSongIndex - 1;
+  const index = currentSongIndex === 0 ? allData.length - 1 : currentSongIndex - 1;
   changeSong(index);
 }
 
