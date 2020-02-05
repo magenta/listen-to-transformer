@@ -17,7 +17,7 @@
 
 const MODEL = 'a1';
 const NUM_MODEL_FILES = 99975;
-const FILE_PREFIX = 'https://magentadata.storage.googleapis.com/piano_transformer_midi/';
+const FILE_PREFIX = 'https://magentadata.storage.googleapis.com/piano_transformer/midi/';
 
  // Update this if the format we store the data into local storage has changed.
 const STORAGE_VERSION = '0.0.1';
@@ -88,7 +88,7 @@ async function getSong(path) {
   const songData = {};
   allData.push(songData);
   songData.path = path;
-  songData.fileName = songData.path.replace(FILE_PREFIX, '');
+  songData.fileName = songData.path.replace(`${FILE_PREFIX}${MODEL}/`, '');
   const ns = await core.urlToNoteSequence(path);
   const quantized = core.sequences.quantizeNoteSequence(ns, 4);
   songData.sequence = quantized;
@@ -339,7 +339,7 @@ function updateCanvas(songData) {
 
 function getRandomMidiFilename() {
   const index = Math.floor(Math.random() * NUM_MODEL_FILES);
-  return `${FILE_PREFIX}${index}.mid`;
+  return `${FILE_PREFIX}${MODEL}/${index}.mid`;
 }
 
 function getFromLocalStorage(key) {
