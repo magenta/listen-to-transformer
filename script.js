@@ -189,6 +189,8 @@ function startPlayer() {
   } else {
     player.resume();
   }
+
+  clearInterval(progressInterval);
   progressInterval = setInterval(updateProgressBar, 1000);
   document.getElementById('btnPlay').classList.add('active');
   document.querySelector('.album').classList.add('rotating');
@@ -196,6 +198,7 @@ function startPlayer() {
 
 const progressBar = document.querySelector('progress');
 const currentTime = document.querySelector('.current-time');
+
 function updateProgressBar() {
   secondsElapsed++;
   progressBar.value = secondsElapsed;
@@ -225,23 +228,23 @@ function changeSong(index, noAutoplay = false) {
   pausePlayer(true);
   window.location.hash = MODEL + '_' + allData[index].fileName;
 
-  // Get ready for playing, and start playing if we need to.
-  // This takes the longes so start early.
   const sequence = allData[index].sequence;
-  player.loadSamples(sequence).then(() => {
-    if (!noAutoplay) {
-      startPlayer();
-    }
-  });
 
   // Set up the progress bar.
   const seconds = Math.round(sequence.totalTime);
   const totalTime = formatSeconds(seconds);
   document.querySelector('.total-time').textContent = totalTime;
-
   const progressBar = document.querySelector('progress');
   progressBar.max = seconds;
   progressBar.value = 0;
+
+  // Get ready for playing, and start playing if we need to.
+  // This takes the longest so start early.
+  player.loadSamples(sequence).then(() => {
+    if (!noAutoplay) {
+      startPlayer();
+    }
+  });
 
   // Set up the album art.
   updateCanvas(allData[index]);
