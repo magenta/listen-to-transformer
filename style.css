@@ -262,7 +262,7 @@ button.active {
   overflow: auto;
 }
 .popup.share.showing {
-  height: 180px;
+  height: 200px;
 }
 .popup .content {
   display: none;
@@ -311,17 +311,12 @@ button.active {
   width: 100vw;
   z-index: -2;
   fill-opacity: 0.5;
-  xanimation: ebb 30s infinite ease-in-out
 }
 .waves > svg > path:first-of-type {
   fill: var(--primary_light);
 }
 .waves > svg > path:last-of-type {
   fill: var(--tertiary_light);
-}
-@keyframes ebb {
-  0% { transform: scaleY(1) }
-  50%   { transform: scaleY(2) }
 }
 
 /*
