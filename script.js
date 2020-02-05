@@ -20,7 +20,7 @@ const NUM_MODEL_FILES = 99975;
 const FILE_PREFIX = 'https://magentadata.storage.googleapis.com/piano_transformer/midi/';
 
  // Update this if the format we store the data into local storage has changed.
-const STORAGE_VERSION = '0.0.1';
+const STORAGE_VERSION = '0.0.2';
 
 const STORAGE_KEYS = {FAVES: 'faves', VERSION: 'data_version'};
 const EVENTS = {
@@ -284,7 +284,7 @@ function refreshPlayListIfVisible() {
     <div>${faves[i].name}</div>
     <div>${faves[i].totalTime}</div>
     <div class="horizontal">
-      <button title="play song" class="play" data-filename=${faves[i].name}>
+      <button title="play song" class="play" data-path=${faves[i].path} data-filename=${faves[i].name}>
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
       </button>
       <button title="un-favourite song" class="remove" data-index=${i}>
@@ -296,6 +296,7 @@ function refreshPlayListIfVisible() {
     li.onclick = (event) => {
       const file = event.target.dataset.filename;
       const index = event.target.dataset.index;
+      const path = event.target.dataset.path;
 
       const className = event.target.className;
       if (className === 'remove') {
@@ -303,8 +304,7 @@ function refreshPlayListIfVisible() {
         removeSongFromPlaylist(index);
         tagClick(EVENTS.UNFAVE, false, file);
       } else if (className === 'play') {
-        getSong(`${FILE_PREFIX}${file}`).then(
-          () => changeSong(allData.length - 1));
+        getSong(path).then(() => changeSong(allData.length - 1));
       }
     }
   }
@@ -316,6 +316,7 @@ function addSongToPlaylist() {
   const song = allData[currentSongIndex];
   faves.push({
     name: song.fileName,
+    path: song.path,
     totalTime: formatSeconds(song.sequence.totalTime)
   });
   saveToLocalStorage(STORAGE_KEYS.FAVES, faves);
