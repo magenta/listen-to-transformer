@@ -15,11 +15,12 @@
  * limitations under the License.
  */
 
- const FILE_PREFIX = 'https://magentadata.storage.googleapis.com/piano_transformer_midi/';
-// Update this if the format we store the data into local storage has changed.
+const MODEL = 'a1';
+const NUM_MODEL_FILES = 99975;
+const FILE_PREFIX = 'https://magentadata.storage.googleapis.com/piano_transformer_midi/';
+
+ // Update this if the format we store the data into local storage has changed.
 const STORAGE_VERSION = '0.0.1';
-// Update this if the MIDI files have changed (because they were generated with a new model, etc.)
-const MODEL_VERSION = '1.0';
 
 const STORAGE_KEYS = {FAVES: 'faves', VERSION: 'data_version'};
 const EVENTS = {
@@ -58,7 +59,11 @@ function init() {
   });
 
   const hash = window.location.hash.substr(1).trim();
-  const initialMidi = hash !== '' ? `${FILE_PREFIX}${hash}` : undefined;
+  let initialMidi;
+  if (hash !== '') {
+    const parts = hash.split('_');  // [model, filename];
+    initialMidi = `${FILE_PREFIX}${parts[0]}/${parts[1]}`;
+  }
 
   getSong(initialMidi).then(() => changeSong(0, true));
 
@@ -218,7 +223,7 @@ function changeSong(index, noAutoplay = false) {
   }
 
   pausePlayer(true);
-  window.location.hash = allData[index].fileName;
+  window.location.hash = MODEL + '_' + allData[index].fileName;
 
   // Get ready for playing, and start playing if we need to.
   // This takes the longes so start early.
@@ -333,8 +338,7 @@ function updateCanvas(songData) {
 }
 
 function getRandomMidiFilename() {
-  const numFiles = 99975;
-  const index = Math.floor(Math.random() * numFiles);
+  const index = Math.floor(Math.random() * NUM_MODEL_FILES);
   return `${FILE_PREFIX}${index}.mid`;
 }
 
@@ -356,7 +360,7 @@ function tagClick(eventName, logPlayTime, filename) {
   filename = filename || allData[currentSongIndex].fileName;
 
   const details = {};
-  details['event_category'] = MODEL_VERSION;
+  details['event_category'] = MODEL;
   details['event_label'] = filename;
 
   if (logPlayTime) {
