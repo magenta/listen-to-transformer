@@ -21,10 +21,9 @@
 
 body {
   --background: #f2f4f6;
-  --primary_light: #f582ae;
-  --secondary_light: #ffd803;
-  --tertiary_light: #00ebc7;
-  --primary_dark: #232946;
+  --foreground: #232946;
+  --primary: #f582ae;
+  --secondary: #00ebc7;
   --spacing-s: 8px;
   --spacing: 14px;
   --spacing-m: 28px;
@@ -35,7 +34,7 @@ body {
   overflow: hidden;
   margin: 0;
   background: var(--background);
-  color: var(--primary_dark);
+  color: var(--foreground);
   font-family: 'Work Sans', sans-serif;
 }
 
@@ -64,7 +63,7 @@ a:link, a:visited {
   transition: color 0.2s ease-in-out;
 }
 a:hover {
-  color: var(--primary_light);
+  color: var(--primary);
 }
 
 section {
@@ -166,7 +165,7 @@ progress::-webkit-progress-bar {
 progress::-webkit-progress-value {
   border: none;
   box-shadow: none;
-  background: var(--primary_dark);
+  background: var(--foreground);
 }
 
 /*
@@ -179,7 +178,7 @@ progress::-webkit-progress-value {
 
 button, .button {
   display:block;
-  color: var(--primary_dark);
+  color: var(--foreground);
   background: transparent;
   border: none;
   border-radius: 50%;
@@ -196,23 +195,25 @@ a.button:link, a.button:visited {
   text-decoration: none;
 }
 button.square {
-  border: 2px solid black;
+  border: 1px solid #00b398;
   border-radius: 3px;
-  padding: var(--spacing-s);
-  background: transparent;
-  color: var(--primary_dark);
+  padding: var(--spacing-s) var(--spacing-m);
+  background: var(--secondary);
+  color: var(--foreground);
   min-width: 100px;
   transition: background 0.2s linear;
   margin: var(--spacing-m) auto;
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
 button.square:hover {
-  background: var(--primary_light);
-  border-color: var(--primary_light);
-  color: var(--primary_dark);
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--foreground);
 }
 
 button:hover {
-  color: var(--primary_light);
+  color: var(--primary);
 }
 button svg, .button svg {
   pointer-events: none;
@@ -231,7 +232,7 @@ button.active > svg.no {
   display: none;
 }
 button.active {
-  color: var(--tertiary_light);
+  color: var(--secondary);
 }
 
 #btnShare svg {
@@ -314,10 +315,10 @@ button.active {
   fill-opacity: 0.5;
 }
 .waves > svg > path:first-of-type {
-  fill: var(--primary_light);
+  fill: var(--primary);
 }
 .waves > svg > path:last-of-type {
-  fill: var(--tertiary_light);
+  fill: var(--secondary);
 }
 
 /*
