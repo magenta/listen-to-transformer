@@ -156,6 +156,9 @@ function toggleHelp() {
   const el = document.querySelector('.splash');
   document.querySelector('.main').hidden = el.hidden;
   el.hidden = !el.hidden;
+
+  const btn = document.getElementById('btnCloseHelp');
+  btn.textContent = 'close';
 }
 
 /*
