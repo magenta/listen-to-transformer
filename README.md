@@ -8,5 +8,4 @@ The artwork for each song is algorithmically generated based on the notes in the
 
 <img width="600" alt="Album art for 3 different songs" src="https://user-images.githubusercontent.com/1369170/74288605-b36f7480-4ce1-11ea-8606-9eeef26b6451.png">
 
-<br>
 For those interested in all the ones and zeros of this work, you can read more about the model in the [blog post](https://magenta.tensorflow.org/music-transformer) announcing it, the [research paper](https://arxiv.org/abs/1809.04281) it was published in, or the [blog post]() about this app.
