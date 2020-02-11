@@ -380,14 +380,14 @@ function tagClick(eventName, logPlayTime, filename) {
  * Album art.
  */
 function sketch(p) {
-  const BLACK = 0;
   const BACKGROUND = '#f2f4f6';
-  const PRIMARY_LIGHT = '#f582ae';
-  const SECONDARY_LIGHT = '#00ebc7';
-  const TERTIARY_LIGHT = '#ffd803';
-  const FOURTH_LIGHT = '#d4d8f0';
-  const PRIMARY_DARK = '#232946';
-  const COLORS = [SECONDARY_LIGHT, PRIMARY_LIGHT, TERTIARY_LIGHT, PRIMARY_DARK, FOURTH_LIGHT, BLACK];
+  const pink = '#f582ae';
+  const green = '#00ebc7';
+  const yellow = '#ffd803';
+  const purple = '#d4d8f0';
+  const dark = '#232946';
+  const black = 0;
+  const COLORS = [green, pink, yellow, dark, purple, black];
   const CANVAS_SIZE = 300;
 
   p.setup = function() {
@@ -462,18 +462,8 @@ function sketch(p) {
   function drawRotatedRectangle2(x, y, w, h, color, outline=false) {
     _drawRotatedRectangle(x, y, w, h, color, outline, p.PI / 4);
   }
-
   function drawRectangle(x, y, w, h, color, outline=false) {
     setupFillAndStroke(color, w, outline);
     p.rect(x, y, w, h);
-  }
-
-  function drawTriangle(x, y, size, color, outline=false) {
-    setupFillAndStroke(color, size, outline);
-    p.triangle(
-      x, y - size / 2,
-      x + size / 2, y + size / 2,
-      x - size / 2, y + size / 2
-    );
   }
 };
