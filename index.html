@@ -17,15 +17,14 @@ limitations under the License.
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
-      gtag('config', 'UA-80107903-3');
+      gtag('config', 'UA-80107903-3', { 'anonymize_ip': true });
     </script>
 
     <title>Listen To Transformer</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css?family=Work+Sans:400,700&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.min.js"></script>
   </head>
   <body>
     <section class="splash">
@@ -34,8 +33,8 @@ limitations under the License.
           <h1>Listen to Transformer</h1>
 
           <p><a href="https://magenta.tensorflow.org/piano-transformer">Music Transformer</a> is an open source machine learning model from the
-            <a href="http://magenta.tensorflow.org/">Magenta</a> research group at Google that can generate long musical
-            performances -- think 1-2 minutes of audio with some long-term structure.
+            <a href="http://magenta.tensorflow.org/">Magenta</a> research group at Google that can generate musical
+            performances with some long-term structure.
             We find it interesting to see what these models can and can’t do,
             so we made this app to make it easier to explore and curate the model’s output.
           </p>
@@ -46,8 +45,9 @@ limitations under the License.
             compositions (like a lot of  fully AI-generated music)
             are nowhere near as good and interesting as what people compose.
              And that’s okay! We just thought it would be fun for more people to be able
-             to hear them, think about them, or remix them in their own music.
-             All samples are downloadable as MIDI files under a CC0 (“No Rights Reserved”)
+             to hear them, think about them, or remix them in their own music.So here is
+             a radio station of 10000 random, not cherry-picked, samples.
+             They are all downloadable as MIDI files under a CC0 (“No Rights Reserved”)
              license, so if you want to take one of the pieces and make it your own,
              do it -- we’d love to hear all about it!
           </p>
@@ -60,7 +60,8 @@ limitations under the License.
             app on GitHub.
           </p>
 
-          <p>In order to understand a bit better which pieces people like, skip over,
+          <p>When you favourite a song, it is only stored locally, in your browser's cache,
+            and not on any external server. In order to understand a bit better which pieces people like, skip over,
             or keep going back to, we are collecting some anonymous click analytics
             from this app. <a href="https://policies.google.com/privacy?hl=en&gl=us">Privacy & Terms</a>.
           </p>
@@ -151,6 +152,20 @@ limitations under the License.
       </svg>
     </div>
   </body>
+
+  <script>
+   if (typeof(Storage) !== 'undefined') {
+    const hasShownSplash = window.localStorage.getItem('has_shown_splash');
+    if (hasShownSplash === 'true') {
+      document.querySelector('.splash').hidden = true;
+      document.querySelector('.main').hidden = false;
+    } else {
+      document.querySelector('.splash').hidden = false;
+      document.querySelector('.main').hidden = true;
+      window.localStorage.setItem('has_shown_splash', true);
+    }
+   }
+  </script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/13.8.25/Tone.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@magenta/music@^1.0.0/es6/core.js"></script>
