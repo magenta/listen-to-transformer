@@ -235,9 +235,11 @@ function changeSong(index, noAutoplay = false) {
   // Update the share dialog with this index.
   const twitterPrefix = 'https://twitter.com/intent/tweet?hashtags=madewithmagenta&text=Listen%20to%20this%20Piano%20Transformer%20composition%21%20';
   const fbPrefix = 'https://www.facebook.com/sharer/sharer.php?u=';
-  const url = `https://g.co/magenta/listen%23${hash}`;
-  document.querySelector('a.twitter').href =  `${twitterPrefix}${url}`;
-  document.querySelector('a.fb').href = `${fbPrefix}${url}`;
+  const twitterUrl = escape(`https://g.co/magenta/listen#${hash}`);
+  // FB really doesn't like g.co for some reason.
+  const fbUrl = `https://magenta.github.io/listen-to-transformer#${hash}`;
+  document.querySelector('a.twitter').href =  `${twitterPrefix}${twitterUrl}`;
+  document.querySelector('a.fb').href = `${fbPrefix}${fbUrl}`;
 
   const sequence = allData[index].sequence;
 
