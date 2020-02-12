@@ -158,7 +158,12 @@ function toggleHelp() {
   el.hidden = !el.hidden;
 
   const btn = document.getElementById('btnCloseHelp');
-  btn.textContent = 'close';
+  if (btn.textContent === 'close') {
+    return;
+  } else {
+    btn.textContent = 'close';
+    startPlayer();
+  }
 }
 
 /*
