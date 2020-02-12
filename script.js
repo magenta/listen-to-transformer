@@ -229,7 +229,15 @@ function changeSong(index, noAutoplay = false) {
   }
 
   pausePlayer(true);
-  window.location.hash = MODEL + '_' + allData[index].fileName;
+  const hash =  MODEL + '_' + allData[index].fileName;
+  window.location.hash = hash;
+
+  // Update the share dialog with this index.
+  const twitterPrefix = 'https://twitter.com/intent/tweet?hashtags=madewithmagenta&text=Listen%20to%20this%20Piano%20Transformer%20composition%21%20';
+  const fbPrefix = 'https://www.facebook.com/sharer/sharer.php?u=';
+  const url = `https://g.co/magenta/listen-to-transformer%23${hash}`;
+  document.querySelector('a.twitter').href =  `${twitterPrefix}${url}`;
+  document.querySelector('a.fb').href = `${fbPrefix}${url}`;
 
   const sequence = allData[index].sequence;
 
