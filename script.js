@@ -37,7 +37,7 @@ const canvas =  new p5(sketch, document.querySelector('.canvas-container'));
 const HAS_LOCAL_STORAGE = typeof(Storage) !== 'undefined';
 
 // FML, these p5 canvases are async?
-setTimeout(init, 100);
+setTimeout(init, 200);
 
 function init() {
   // Event listeners.
