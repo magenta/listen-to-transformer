@@ -1,0 +1,18 @@
+{
+  "name": "listen-to-transformer",
+  "version": "0.0.1",
+  "description": "An app to make it easier to explore and curate output from a Music Transformer",
+  "main": "script.js",
+  "scripts": {
+    "start": "hs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/magenta/listen-to-transformer.git"
+  },
+  "author": "Monica Dinculescu <noms@google.com>",
+  "license": "Apache 2.0",
+  "devDependencies": {
+    "http-server": "^0.12.1"
+  }
+}
