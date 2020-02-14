@@ -19,11 +19,10 @@ limitations under the License.
       gtag('js', new Date());
       gtag('config', 'UA-80107903-3', { 'anonymize_ip': true });
     </script>
-
     <title>Listen To Transformer</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- OpenGraph data -->
-    <meta property="og:image" content="https://magenta.github.io/listen-to-transformer/logo.png">
+    <meta property="og:image" content="https://magenta.github.io/listen-to-transformer/assets/logo.png">
     <meta property="og:title" content="Listen to Transformer">
     <meta property="og:description" content="An app to make it easier to explore and curate output from a music transformer">
     <meta property="og:url" content="https://magenta.github.io/listen-to-transformer/">
@@ -31,7 +30,22 @@ limitations under the License.
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Listen to Transformer">
     <meta name="twitter:description" content="An app to make it easier to explore and curate output from a music transformer">
-    <meta name="twitter:image" content="https://magenta.github.io/listen-to-transformer/logo.png">
+    <meta name="twitter:image" content="https://magenta.github.io/listen-to-transformer/assets/logo.png">
+    <!-- PWA stuff -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#00ebc7">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="listen-to-transformer">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="listen-to-transformer">
+    <link rel="apple-touch-icon" href="assets/logo.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="assets/logo-144.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="assets/logo-192.png">
+    <meta name="msapplication-TileImage" content="assets/logo-144.png">
+    <meta name="msapplication-TileColor" content="#00ebc7">
+    <meta name="msapplication-tap-highlight" content="no">
+    <!-- Actual useful things -->
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css?family=Work+Sans:400,700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.min.js"></script>
