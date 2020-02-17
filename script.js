@@ -232,7 +232,6 @@ function changeSong(index, noAutoplay = false) {
   } else {
     document.getElementById('btnPrevious').removeAttribute('disabled');
   }
-
   pausePlayer(true);
   const hash =  MODEL + '_' + allData[index].fileName;
   window.location.hash = hash;
@@ -480,3 +479,44 @@ function sketch(p) {
     p.rect(x, y, w, h);
   }
 };
+
+if (navigator.mediaSession) {
+
+  function playAudio() {
+    var audio = document.createElement('audio');
+    audio.src = './silence.mp3'; // silence must be at least 5 seconds https://freesound.org/people/silentspeaker/sounds/426895/
+
+    // to keep the controls open, must loop the silence
+    audio.addEventListener('ended', function() {
+      this.currentTime = 0;
+      this.play();
+    }, false);
+
+    audio.play().then(_ => {
+      let playing = true;
+      navigator.mediaSession.setActionHandler('play', function() {
+        audio.play()
+      });
+      navigator.mediaSession.setActionHandler('pause', function() {
+        if (playing) {
+          audio.pause()
+          window.pausePlayer()
+        }
+        else {
+          audio.play()
+          window.startPlayer()
+        }
+        playing = !playing
+      });
+      navigator.mediaSession.setActionHandler('nexttrack', function() {
+        window.nextSong()
+        //store.dispatch(next());
+      });
+    }).catch(error => { console.log(error); });
+  }
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.interact').forEach(b => {
+      b.addEventListener('click', playAudio)
+    })
+  })
+}
