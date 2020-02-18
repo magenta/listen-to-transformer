@@ -483,21 +483,30 @@ function sketch(p) {
 if (navigator.mediaSession) {
 
   function playAudio() {
-    var audio = document.createElement('audio');
-    audio.src = './silence.mp3'; // silence must be at least 5 seconds https://freesound.org/people/silentspeaker/sounds/426895/
 
-    // to keep the controls open, must loop the silence
-    audio.addEventListener('ended', function() {
-      this.currentTime = 0;
-      this.play();
-    }, false);
+    // to keep the controls open, must use a audio element
+    // We choose a file full of silence (at least 5 seconds), and loop it
+    // see https://developers.google.com/web/updates/2017/02/media-session#implementation_notes
+
+    // see point 5. specifically
+
+    //   "As the Web Audio API doesn't request Android Audio Focus for historical reasons,
+    //   the only way to make it work with the Media Session API is to hook up an element
+    //   as the input source to the Web Audio API. Hopefully, the proposed Web AudioFocus
+    //   API will improve the situation in the near future."
+
+    const audio = document.createElement('audio')
+    audio.src = './silence.mp3' // silence must be at least 5 seconds https://freesound.org/people/silentspeaker/sounds/426895/
+
+    audio.addEventListener('ended', () => {
+      this.currentTime = 0
+      this.play()
+    }, false)
 
     audio.play().then(_ => {
-      let playing = true;
-      navigator.mediaSession.setActionHandler('play', function() {
-        audio.play()
-      });
-      navigator.mediaSession.setActionHandler('pause', function() {
+      let playing = true
+      navigator.mediaSession.setActionHandler('play', () => audio.play())
+      navigator.mediaSession.setActionHandler('pause', () => {
         if (playing) {
           audio.pause()
           window.pausePlayer()
@@ -507,12 +516,9 @@ if (navigator.mediaSession) {
           window.startPlayer()
         }
         playing = !playing
-      });
-      navigator.mediaSession.setActionHandler('nexttrack', function() {
-        window.nextSong()
-        //store.dispatch(next());
-      });
-    }).catch(error => { console.log(error); });
+      })
+      navigator.mediaSession.setActionHandler('nexttrack', () => window.nextSong())
+    }).catch(error => console.log(error))
   }
   document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.interact').forEach(b => {
